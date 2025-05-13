@@ -1,0 +1,59 @@
+{
+  "name": "vscode-web-components-ai",
+  "version": "0.0.1",
+  "displayName": "Web Component AI Tools",
+  "description": "Supercharge your AI coding assistants with web component information from your workspace and dependencies. Generate accurate component code using your actual custom elements, properties, and APIs.",
+  "publisher": "d13",
+  "author": {
+    "name": "Keith Daulton",
+    "email": "kdaulton@d13design.com"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "homepage": "https://github.com/d13/vscode-web-components-ai",
+  "bugs": {
+    "url": "https://github.com/d13/vscode-web-components-ai/issues"
+  },
+  "repository": {
+    "url": "https://github.com/d13/vscode-web-components-ai.git",
+    "type": "git"
+  },
+  "engines": {
+    "node": "^20.18.3",
+    "vscode": "^1.99.0"
+  },
+  "activationEvents": [],
+  "capabilities": {
+    "virtualWorkspaces": false
+  },
+  "contributes": {},
+  "main": "./dist/extension.js",
+  "scripts": {
+    "build": "webpack --mode development",
+    "clean": "pnpx rimraf dist out .vscode-test .vscode-test-web .eslintcache* tsconfig*.tsbuildinfo",
+    "bundle": "webpack --mode production",
+    "bundle:extension": "webpack --mode production --config-name extension:node",
+    "package": "vsce package --no-dependencies",
+    "pub": "vsce publish --no-dependencies",
+    "watch": "webpack --watch --mode development",
+    "vscode:prepublish": "pnpm run package"
+  },
+  "dependencies": {
+    "@wc-toolkit/cem-utilities": "^1.2.0",
+    "globby": "^14.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "@types/vscode": "1.99.0",
+    "@vscode/vsce": "^3.3.2",
+    "copy-webpack-plugin": "^13.0.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3",
+    "webpack": "^5.99.8",
+    "webpack-cli": "^6.0.1"
+  },
+  "packageManager": "pnpm@9.6.0+sha1.65cd48c20dd329b7f455088b6dd17d4d5b6d02e3"
+}
