@@ -1,0 +1,46 @@
+import { env } from 'process';
+import { ExtensionContext, window, Uri, ExtensionMode, version } from 'vscode';
+import { isWeb } from '@env/platform';
+import { Logger } from './system/logger';
+import { satisfies } from './system/version';
+import { Container } from './container';
+import { configuration, Configuration } from './system/configuration';
+import { registerDeferredCommands } from './system/command';
+import './commands';
+
+export function activate(context: ExtensionContext) {
+  const extensionName: string = context.extension.packageJSON.displayName;
+  const extensionVersion: string = context.extension.packageJSON.version;
+  const prerelease = satisfies(extensionVersion, '> 2025.0.0');
+
+  Logger.configure(
+    {
+      name: extensionName,
+      createChannel: function (name: string) {
+        return window.createOutputChannel(name);
+      },
+      toLoggable: function (o: any) {
+        if (o instanceof Uri) return `Uri(${o.toString(true)})`;
+        return undefined;
+      },
+    },
+    configuration.get('outputLevel'),
+    context.extensionMode === ExtensionMode.Development,
+  );
+
+  Logger.log(
+    `${extensionName}${prerelease ? ' (pre-release)' : ''} v${extensionVersion} activating in ${
+      env.appName
+    }(${version}) on the ${isWeb ? 'web' : 'desktop'}`,
+  );
+
+  Configuration.configure(context);
+  const container = Container.create(context, prerelease, extensionVersion);
+
+  context.subscriptions.push(...registerDeferredCommands(container));
+}
+
+export function deactivate() {
+  // nothing to do
+  return undefined;
+}
