@@ -3,6 +3,7 @@ import { configuration } from './system/configuration';
 import { Storage } from './system/storage';
 import { Logger } from './system/logger';
 import { memoize } from './system/decorators/memoize';
+import { ManifestLocationProvider } from './cem/locator';
 
 export class Container {
   static #instance: Container | undefined;
@@ -42,6 +43,8 @@ export class Container {
       configuration.onDidChangeAny(this.onAnyConfigurationChanged.bind(this)),
     ];
 
+    disposables.push((this._locator = new ManifestLocationProvider(this)));
+
     context.subscriptions.push({
       dispose: function () {
         disposables.reverse().forEach(d => void d.dispose());
@@ -62,6 +65,11 @@ export class Container {
   @memoize()
   get id(): string {
     return this._context.extension.id;
+  }
+
+  private _locator: ManifestLocationProvider;
+  get locator() {
+    return this._locator;
   }
 
   private _prerelease: boolean;
