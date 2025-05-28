@@ -11,6 +11,9 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.12.0
         version: 1.12.0
+      '@wc-toolkit/cem-utilities':
+        specifier: ^1.2.0
+        version: 1.2.0
     devDependencies:
       '@types/node':
         specifier: ^22.15.17
@@ -286,6 +289,9 @@ packages:
     resolution: {integrity: sha512-U2gC7GiQc22nxRpWH4cdW16rRr5u9w+Bjsjm8g8mEjY4aeOG1U6/3XNGq+ElwdeoT8jAyhBmBAuYG7INcSe/6A==}
     engines: {node: '>= 20'}
     hasBin: true
+
+  '@wc-toolkit/cem-utilities@1.2.0':
+    resolution: {integrity: sha512-RO6r8x4V8xGENPyAsWin00JzNxZXg+tTBSM38t/H3eJ72wPPIOMyNEA76lW75IseDDRFfgAg4R5mu9Ny0vCmSg==}
 
   '@webassemblyjs/ast@1.14.1':
     resolution: {integrity: sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ==}
@@ -2249,6 +2255,8 @@ snapshots:
       keytar: 7.9.0
     transitivePeerDependencies:
       - supports-color
+
+  '@wc-toolkit/cem-utilities@1.2.0': {}
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:

@@ -79,6 +79,10 @@ export class ManifestLocationProvider implements Disposable {
     return Array.from(this._manifestUris);
   }
 
+  async getManifests(): Promise<Uri[]> {
+    return await this.locate();
+  }
+
   private async findLocalPackages(): Promise<Uri[]> {
     const localPackages: Uri[] = [];
 

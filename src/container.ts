@@ -4,6 +4,8 @@ import { Storage } from './system/storage';
 import { Logger } from './system/logger';
 import { memoize } from './system/decorators/memoize';
 import { ManifestLocationProvider } from './cem/locator';
+import { McpProvider } from './mcp/provider';
+import { CustomElementsManifestReader, ManifestsReader } from './cem/reader';
 
 export class Container {
   static #instance: Container | undefined;
@@ -44,12 +46,19 @@ export class Container {
     ];
 
     disposables.push((this._locator = new ManifestLocationProvider(this)));
+    this._cem = new ManifestsReader(this);
+    disposables.push((this._mcp = new McpProvider(this)));
 
     context.subscriptions.push({
       dispose: function () {
         disposables.reverse().forEach(d => void d.dispose());
       },
     });
+  }
+
+  private _cem: CustomElementsManifestReader;
+  get cem(): CustomElementsManifestReader {
+    return this._cem;
   }
 
   private _context: ExtensionContext;
@@ -70,6 +79,11 @@ export class Container {
   private _locator: ManifestLocationProvider;
   get locator() {
     return this._locator;
+  }
+
+  private _mcp: McpProvider;
+  get mcp() {
+    return this._mcp;
   }
 
   private _prerelease: boolean;
