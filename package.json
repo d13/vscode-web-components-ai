@@ -50,7 +50,7 @@
     "package": "vsce package --no-dependencies",
     "pub": "vsce publish --no-dependencies",
     "watch": "webpack --watch --mode development",
-    "vscode:prepublish": "pnpm run package"
+    "vscode:prepublish": "pnpm run bundle"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
