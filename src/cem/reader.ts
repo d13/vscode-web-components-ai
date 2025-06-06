@@ -6,6 +6,7 @@ import { Logger } from '../system/logger';
 export interface CustomElementsManifestReader {
   getAllComponents(): Promise<Component[]>;
   getComponentByTagName(tag: string): Promise<Component | undefined>;
+  searchComponents(query: string): Promise<Component[]>;
   //   private ensureManifest(force?: boolean): Promise<boolean>;
 }
 
@@ -53,6 +54,19 @@ export class ManifestsReader implements CustomElementsManifestReader {
     }
     return undefined;
   }
+
+  async searchComponents(query: string): Promise<Component[]> {
+    await this.ensureManifest();
+    if (this.manifests === undefined) {
+      return [];
+    }
+    const components: Component[] = [];
+    for (const manifest of this.manifests) {
+      const manifestComponents = await manifest.searchComponents(query);
+      components.push(...manifestComponents);
+    }
+    return components;
+  }
 }
 
 export class ManifestReader implements CustomElementsManifestReader {
@@ -83,11 +97,22 @@ export class ManifestReader implements CustomElementsManifestReader {
     return getAllComponents(this.manifest);
   }
 
-  async getComponentByTagName(tag: string) {
+  async getComponentByTagName(tag: string): Promise<Component | undefined> {
     await this.ensureManifest();
     if (this.manifest === undefined) {
       return undefined;
     }
     return getComponentByTagName(this.manifest, tag);
+  }
+
+  async searchComponents(query: string): Promise<Component[]> {
+    await this.ensureManifest();
+    if (this.manifest === undefined) {
+      return [];
+    }
+    const components = getAllComponents(this.manifest);
+    return components.filter(
+      c => c.tagName?.includes(query) || c.name.includes(query) || c.description?.includes(query),
+    );
   }
 }
