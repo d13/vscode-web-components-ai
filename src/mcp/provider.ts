@@ -1,13 +1,11 @@
-import { ConfigurationTarget, Disposable, env, window } from 'vscode';
+import { Disposable } from 'vscode';
 import { Container } from '../container';
-import { Server } from 'http';
 import { createHttpTransport, HttpTransportInfo } from './utils/transport';
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { Logger } from '../system/logger';
 import { z } from 'zod';
 import { executeCommand } from '../system/command';
 import { configuration } from '../system/configuration';
-import { start } from 'repl';
 
 export const MANIFEST_SCHEME = 'manifest' as const;
 
@@ -132,10 +130,17 @@ export class McpProvider implements Disposable {
       'Search for web components by name, tag name, or description. Returns matching components with their basic information.',
       {
         query: z.string().describe('Search term to find components by name, tag, or description'),
+        matching: z
+          .enum(['strict', 'all', 'any'])
+          .optional()
+          .default('any')
+          .describe(
+            'Matching strategy for search. Options are "strict" (exact match), "all" (all terms must match), or "any" (any term can match). Default is "any".',
+          ),
       },
-      async ({ query }) => {
+      async ({ query, matching }) => {
         try {
-          const matchingComponents = await this._container.cem.searchComponents(query);
+          const matchingComponents = await this._container.cem.searchComponents(query, matching);
 
           return {
             content: [

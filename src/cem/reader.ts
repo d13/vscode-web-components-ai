@@ -6,7 +6,7 @@ import { Logger } from '../system/logger';
 export interface CustomElementsManifestReader {
   getAllComponents(): Promise<Component[]>;
   getComponentByTagName(tag: string): Promise<Component | undefined>;
-  searchComponents(query: string): Promise<Component[]>;
+  searchComponents(query: string, matching?: 'strict' | 'all' | 'any'): Promise<Component[]>;
   //   private ensureManifest(force?: boolean): Promise<boolean>;
 }
 
@@ -55,14 +55,14 @@ export class ManifestsReader implements CustomElementsManifestReader {
     return undefined;
   }
 
-  async searchComponents(query: string): Promise<Component[]> {
+  async searchComponents(query: string, matching?: 'strict' | 'all' | 'any'): Promise<Component[]> {
     await this.ensureManifest();
     if (this.manifests === undefined) {
       return [];
     }
     const components: Component[] = [];
     for (const manifest of this.manifests) {
-      const manifestComponents = await manifest.searchComponents(query);
+      const manifestComponents = await manifest.searchComponents(query, matching);
       components.push(...manifestComponents);
     }
     return components;
@@ -105,14 +105,44 @@ export class ManifestReader implements CustomElementsManifestReader {
     return getComponentByTagName(this.manifest, tag);
   }
 
-  async searchComponents(query: string): Promise<Component[]> {
+  async searchComponents(query: string, matching?: 'strict' | 'all' | 'any'): Promise<Component[]> {
     await this.ensureManifest();
     if (this.manifest === undefined) {
       return [];
     }
+    query = query.trim();
+    if (query.length === 0) {
+      return [];
+    }
+
     const components = getAllComponents(this.manifest);
-    return components.filter(
-      c => c.tagName?.includes(query) || c.name.includes(query) || c.description?.includes(query),
-    );
+    return filterComponents(components, query, matching);
   }
+}
+
+function filterComponents(
+  components: Component[],
+  query: string,
+  matching: 'strict' | 'all' | 'any' = 'any',
+): Component[] {
+  if (matching === 'strict') {
+    return components.filter(c => c.tagName === query || c.name === query || c.description === query);
+  }
+
+  const filterComponent = (c: Component, text: string): boolean =>
+    (c.tagName?.toLowerCase().includes(text) ||
+      c.name.toLowerCase().includes(text) ||
+      c.description?.toLowerCase().includes(text)) ??
+    false;
+
+  const normalizedQuery = query.toLowerCase();
+  if (normalizedQuery.includes(' ')) {
+    const words = normalizedQuery.split(/\s+/).filter(word => word.length > 0);
+    if (matching === 'all') {
+      return components.filter(c => words.every(word => filterComponent(c, word)));
+    }
+    return components.filter(c => words.some(word => filterComponent(c, word)));
+  }
+
+  return components.filter(c => filterComponent(c, normalizedQuery));
 }
