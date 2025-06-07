@@ -169,7 +169,7 @@ export class McpProvider implements Disposable {
     );
 
     server.tool(
-      'get-component-details',
+      'get-component-details-by-tag-name',
       'Get detailed information about a specific web component by its tag name. Returns complete component metadata including attributes, properties, methods, and events.',
       {
         tagName: z.string().describe('The tag name of the component to get details for'),
@@ -195,6 +195,50 @@ export class McpProvider implements Disposable {
               {
                 type: 'text',
                 text: `Component Details for "${tagName}":\n\n${JSON.stringify(component, null, 2)}`,
+              },
+            ],
+          };
+        } catch (error) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Error getting component details: ${error instanceof Error ? error.message : String(error)}`,
+              },
+            ],
+            isError: true,
+          };
+        }
+      },
+    );
+
+    server.tool(
+      'get-component-details-by-class-name',
+      'Get detailed information about a specific web component by its class name. Returns complete component metadata including attributes, properties, methods, and events.',
+      {
+        className: z.string().describe('The class name of the component to get details for'),
+      },
+      async ({ className }) => {
+        try {
+          const component = await this._container.cem.getComponentByClassName(className);
+
+          if (!component) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `Component with class name "${className}" not found.`,
+                },
+              ],
+              isError: true,
+            };
+          }
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Component Details for "${className}":\n\n${JSON.stringify(component, null, 2)}`,
               },
             ],
           };

@@ -1,11 +1,12 @@
 import { Uri, workspace } from 'vscode';
-import { Component, getAllComponents, getComponentByTagName } from '@wc-toolkit/cem-utilities';
+import { Component, getAllComponents, getComponentByClassName, getComponentByTagName } from '@wc-toolkit/cem-utilities';
 import { Container } from '../container';
 import { Logger } from '../system/logger';
 
 export interface CustomElementsManifestReader {
   getAllComponents(): Promise<Component[]>;
   getComponentByTagName(tag: string): Promise<Component | undefined>;
+  getComponentByClassName(className: string): Promise<Component | undefined>;
   searchComponents(query: string, matching?: 'strict' | 'all' | 'any'): Promise<Component[]>;
   //   private ensureManifest(force?: boolean): Promise<boolean>;
 }
@@ -48,6 +49,20 @@ export class ManifestsReader implements CustomElementsManifestReader {
     }
     for (const manifest of this.manifests) {
       const component = await manifest.getComponentByTagName(tag);
+      if (component !== undefined) {
+        return component;
+      }
+    }
+    return undefined;
+  }
+
+  async getComponentByClassName(className: string): Promise<Component | undefined> {
+    await this.ensureManifest();
+    if (this.manifests === undefined) {
+      return undefined;
+    }
+    for (const manifest of this.manifests) {
+      const component = await manifest.getComponentByClassName(className);
       if (component !== undefined) {
         return component;
       }
@@ -103,6 +118,14 @@ export class ManifestReader implements CustomElementsManifestReader {
       return undefined;
     }
     return getComponentByTagName(this.manifest, tag);
+  }
+
+  async getComponentByClassName(className: string): Promise<Component | undefined> {
+    await this.ensureManifest();
+    if (this.manifest === undefined) {
+      return undefined;
+    }
+    return getComponentByClassName(this.manifest, className);
   }
 
   async searchComponents(query: string, matching?: 'strict' | 'all' | 'any'): Promise<Component[]> {
