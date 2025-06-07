@@ -2,6 +2,11 @@ import { LogLevel } from './system/logger.constants';
 
 export interface Config {
   readonly outputLevel: LogLevel;
+  readonly mcp: {
+    readonly port: number | null;
+    readonly host: string | null;
+    readonly storeHostAndPortOnStart: boolean;
+  };
 }
 
 export type CoreConfig = {

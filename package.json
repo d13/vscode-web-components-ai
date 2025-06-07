@@ -33,10 +33,73 @@
     "onStartupFinished"
   ],
   "contributes": {
+    "configuration": [
+      {
+        "id": "general",
+        "title": "General",
+        "order": 0,
+        "properties": {
+          "wcai.outputLevel": {
+            "type": "string",
+            "default": "warn",
+            "enum": [
+              "off",
+              "error",
+              "warn",
+              "info",
+              "debug"
+            ],
+            "enumDescriptions": [
+              "Logs nothing",
+              "Logs only errors",
+              "Logs errors and warnings",
+              "Logs errors, warnings, and messages",
+              "Logs verbose errors, warnings, and messages. Best for issue reporting."
+            ],
+            "markdownDescription": "Specifies how much (if any) output will be sent to the Web Components AI output channel",
+            "scope": "window",
+            "order": 10
+          }
+        }
+      },
+      {
+        "id": "mcp",
+        "title": "Model Context Protocol (MCP) Server",
+        "order": 10,
+        "properties": {
+          "wcai.mcp.port": {
+            "type": "number",
+            "default": 0,
+            "description": "The HTTP port for the MCP server. The OS will assign a port if this is not set and likely different each time.",
+            "scope": "window",
+            "order": 10
+          },
+          "wcai.mcp.host": {
+            "type": "string",
+            "default": "127.0.0.1",
+            "description": "The HTTP host for the MCP server.",
+            "scope": "window",
+            "order": 20
+          },
+          "wcai.mcp.storeHostAndPortOnStart": {
+            "type": "boolean",
+            "default": true,
+            "description": "Saves the host and port of the MCP server after startup if they are not already in settings. This prevents MCP configuration files from needing to be updated after the MCP server is restarted.",
+            "scope": "window",
+            "order": 30
+          }
+        }
+      }
+    ],
     "commands": [
       {
-        "command": "wcai.locateManifests",
+        "command": "wcai.manifests.locate",
         "title": "Locate Custom Elements Manifests",
+        "category": "Web Components AI"
+      },
+      {
+        "command": "wcai.mcp.showInformation",
+        "title": "MCP Server Information",
         "category": "Web Components AI"
       }
     ]

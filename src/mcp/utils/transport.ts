@@ -7,12 +7,21 @@ import { uuid } from '@env/crypto';
 import { createMcpServer } from './server';
 import { Logger } from '../../system/logger';
 
+export interface HttpTransportInfo {
+  httpServer: Server<typeof IncomingMessage, typeof ServerResponse>;
+  hostName: string;
+  port: number;
+  url: string;
+  mcpUrl: string;
+  sseUrl: string;
+}
+
 export async function createHttpTransport(
   port = 0,
   hostName = '127.0.0.1',
   mcpCallback: (server: McpServer) => void,
   options?: { mcp?: { name?: string; version?: string } },
-): Promise<{ url: string; httpServer: Server<typeof IncomingMessage, typeof ServerResponse> }> {
+): Promise<HttpTransportInfo> {
   const transports = new Map<string, StreamableHTTPServerTransport>();
   const sseTransports = new Map<string, SSEServerTransport>();
   const servers: McpServer[] = [];
@@ -82,8 +91,12 @@ export async function createHttpTransport(
         const serverUrl = `http://${hostName}:${address.port}`;
         Logger.log(`MCP HTTP server listening on ${serverUrl}`);
         resolve({
-          url: serverUrl,
           httpServer,
+          hostName,
+          port: address.port,
+          url: serverUrl,
+          mcpUrl: `${serverUrl}/mcp`,
+          sseUrl: `${serverUrl}/sse`,
         });
       });
     } catch (ex) {

@@ -1,66 +1,77 @@
-import { Disposable, env, window } from 'vscode';
+import { ConfigurationTarget, Disposable, env, window } from 'vscode';
 import { Container } from '../container';
 import { Server } from 'http';
-import { createHttpTransport } from './utils/transport';
+import { createHttpTransport, HttpTransportInfo } from './utils/transport';
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { Logger } from '../system/logger';
 import { z } from 'zod';
+import { executeCommand } from '../system/command';
+import { configuration } from '../system/configuration';
+import { start } from 'repl';
+
+export const MANIFEST_SCHEME = 'manifest' as const;
 
 export class McpProvider implements Disposable {
   private _disposables: Disposable[] = [];
-  private server: Server | undefined;
+  private httpTransport: HttpTransportInfo | undefined;
 
   constructor(private readonly _container: Container) {
     this.start();
+
+    this._disposables.push(
+      configuration.onDidChange(async e => {
+        if (e.affectsConfiguration('mcp.port') || e.affectsConfiguration('mcp.host')) {
+          if (this.httpTransport) {
+            if (
+              this.httpTransport.port === configuration.get('mcp.port') &&
+              this.httpTransport.hostName === configuration.get('mcp.host')
+            ) {
+              return;
+            }
+
+            await this.stop();
+          }
+
+          void this.start();
+        }
+      }),
+    );
+  }
+
+  getServerInfo(): HttpTransportInfo | undefined {
+    if (!this.httpTransport) return undefined;
+
+    return {
+      ...this.httpTransport,
+    };
   }
 
   async start(): Promise<void> {
-    if (this.server) {
+    if (this.httpTransport?.httpServer) {
       return;
     }
 
+    Logger.log('Starting MCP server');
+
     try {
-      // TODO: add configuration for port and host
-      // TODO: MCP server resources, tools, and prompts ...
-      const { url, httpServer } = await createHttpTransport(undefined, undefined, (mcpServer: McpServer) => {
+      const port = configuration.get('mcp.port') ?? undefined;
+      const host = configuration.get('mcp.host') ?? undefined;
+      const httpTransport = await createHttpTransport(port, host, (mcpServer: McpServer) => {
         this.enrichMcpServer(mcpServer);
       });
 
-      this.server = httpServer;
+      this.httpTransport = httpTransport;
 
-      const configString = JSON.stringify(
-        {
-          servers: {
-            'mcp-wcai-http': {
-              type: 'http',
-              url: `${url}/mcp`,
-            },
-            'mcp-wcai-sse': {
-              type: 'sse',
-              url: `${url}/sse`,
-            },
-          },
-        },
-        undefined,
-        2,
-      );
-
-      const message = `MCP server started at ${url}
-
-      Available transports:
-      - HTTP (Streamable): ${url}/mcp
-      - SSE (Server-Sent Events): ${url}/sse
-
-      Copy the following config:
-      ${configString}`;
-
-      const copyConfig = 'Copy Config';
-
-      const result = await window.showInformationMessage(message, copyConfig);
-      if (result === copyConfig) {
-        await env.clipboard.writeText(configString);
-        window.showInformationMessage('MCP configuration copied to clipboard.');
+      if (configuration.get('mcp.storeHostAndPortOnStart')) {
+        if (httpTransport.port !== port) {
+          configuration.updateEffective('mcp.port', httpTransport.port);
+        }
+        if (httpTransport.hostName !== host) {
+          configuration.updateEffective('mcp.host', httpTransport.hostName);
+        }
       }
+
+      void executeCommand('wcai.mcp.showInformation');
     } catch (error) {
       Logger.error('Failed to start MCP server', error);
     }
@@ -68,18 +79,18 @@ export class McpProvider implements Disposable {
 
   stop(): Promise<void> {
     return new Promise<void>((resolve, _reject) => {
-      if (!this.server) {
+      if (!this.httpTransport?.httpServer) {
         resolve();
         return;
       }
       try {
-        this.server.close(() => {
-          this.server = undefined;
+        this.httpTransport.httpServer.close(() => {
+          this.httpTransport = undefined;
           resolve();
         });
       } catch (error) {
         Logger.error('Error while stopping MCP server', error);
-        this.server = undefined;
+        this.httpTransport = undefined;
         resolve();
       }
     });
@@ -87,7 +98,7 @@ export class McpProvider implements Disposable {
 
   private enrichMcpServer(server: McpServer): void {
     // Add server resources, tools, and prompts ...
-    server.resource('manifest', 'manifest://components', async (uri: URL) => {
+    server.resource('manifest', `${MANIFEST_SCHEME}://components`, async (uri: URL) => {
       const components = await this._container.cem.getAllComponents();
       return {
         contents: [
@@ -101,7 +112,7 @@ export class McpProvider implements Disposable {
 
     server.resource(
       'manifest-components',
-      new ResourceTemplate('manifest://components/{tag}', { list: undefined }),
+      new ResourceTemplate(`${MANIFEST_SCHEME}://components/{tag}`, { list: undefined }),
       async (uri: URL, variables) => {
         const component = await this._container.cem.getComponentByTagName(variables.tag as string);
         return {
