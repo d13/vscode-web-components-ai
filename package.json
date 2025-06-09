@@ -118,6 +118,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
     "@wc-toolkit/cem-utilities": "^1.2.0",
+    "custom-elements-manifest": "^2.1.0",
     "zod": "^3.25.32"
   },
   "devDependencies": {

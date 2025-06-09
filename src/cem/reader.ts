@@ -2,6 +2,7 @@ import { Uri, workspace } from 'vscode';
 import { Component, getAllComponents, getComponentByClassName, getComponentByTagName } from '@wc-toolkit/cem-utilities';
 import { Container } from '../container';
 import { Logger } from '../system/logger';
+import { Package } from 'custom-elements-manifest';
 
 export interface CustomElementsManifestReader {
   getAllComponents(): Promise<Component[]>;
@@ -85,7 +86,7 @@ export class ManifestsReader implements CustomElementsManifestReader {
 }
 
 export class ManifestReader implements CustomElementsManifestReader {
-  private manifest: Record<string, unknown> | undefined;
+  private manifest: Package | undefined;
   constructor(private readonly container: Container, private readonly uri: Uri) {}
 
   private async ensureManifest(force: boolean = false): Promise<boolean> {

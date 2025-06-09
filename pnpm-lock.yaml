@@ -14,6 +14,9 @@ importers:
       '@wc-toolkit/cem-utilities':
         specifier: ^1.2.0
         version: 1.2.0
+      custom-elements-manifest:
+        specifier: ^2.1.0
+        version: 2.1.0
       zod:
         specifier: ^3.25.32
         version: 3.25.32
@@ -617,6 +620,9 @@ packages:
   css-what@6.1.0:
     resolution: {integrity: sha512-HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw==}
     engines: {node: '>= 6'}
+
+  custom-elements-manifest@2.1.0:
+    resolution: {integrity: sha512-4TU+YhBQpCGYWonsZVTOPx6aYJXenOiSRT7TNGvDB7ipa4SZSJKed1DYXG77XKL9JFZ86sDSDVkwgv1mqw3V3A==}
 
   debug@4.4.1:
     resolution: {integrity: sha512-KcKCqiftBJcZr++7ykoDIEwSa3XWowTfNPo92BYxjXiyYEVrUQh2aLyhxBCwww+heortUFxEJYcRzosstTEBYQ==}
@@ -2620,6 +2626,8 @@ snapshots:
       nth-check: 2.1.1
 
   css-what@6.1.0: {}
+
+  custom-elements-manifest@2.1.0: {}
 
   debug@4.4.1:
     dependencies:
