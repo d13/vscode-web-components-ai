@@ -103,8 +103,9 @@ The extension provides standard MCP endpoints that work with any MCP-compatible 
 
 ### MCP Tools
 
-- **`search-components`**: Search for components by name, tag name, or description
-- **`get-component-details`**: Get detailed information about a specific component by tag name
+- **`search-components`**: Search for components by class name, tag name, or description
+- **`get-component-details-by-tag-name`**: Get detailed information about a specific component by tag name
+- **`get-component-details-by-class-name`**: Get detailed information about a specific component by class name
 - **`list-all-components`**: List all available components with optional detailed information
 
 ### MCP Resources
@@ -121,7 +122,7 @@ The extension provides standard MCP endpoints that work with any MCP-compatible 
 
 - [Custom Elements Manifest](https://custom-elements-manifest.open-wc.org/) - Standard for describing custom elements
 - [Model Context Protocol](https://modelcontextprotocol.io/) - Protocol for AI assistant integrations
-- [WC Toolkit CEM Utilities](https://github.com/break-stuff/wc-toolkit) - Utilities for working with Custom Elements Manifests
+- [Web Components Toolkit](https://wc-toolkit.com/) - Utilities for working with Custom Elements Manifests
 
 ## 📝 License
 
