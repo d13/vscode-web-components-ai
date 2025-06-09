@@ -126,7 +126,7 @@ export class McpProvider implements Disposable {
 
     // Add tools for web component development
     server.tool(
-      'search-components',
+      'search-web-components',
       'Search for web components by name, tag name, or description. Returns matching components with their basic information.',
       {
         query: z.string().describe('Search term to find components by name, tag, or description'),
@@ -137,6 +137,10 @@ export class McpProvider implements Disposable {
           .describe(
             'Matching strategy for search. Options are "strict" (exact match), "all" (all terms must match), or "any" (any term can match). Default is "any".',
           ),
+      },
+      {
+        title: 'Search Available Web Components',
+        readOnlyHint: true,
       },
       async ({ query, matching }) => {
         try {
@@ -169,10 +173,14 @@ export class McpProvider implements Disposable {
     );
 
     server.tool(
-      'get-component-details-by-tag-name',
+      'get-web-component-details-by-tag-name',
       'Get detailed information about a specific web component by its tag name. Returns complete component metadata including attributes, properties, methods, and events.',
       {
         tagName: z.string().describe('The tag name of the component to get details for'),
+      },
+      {
+        title: 'Get Web Component Details by Tag Name',
+        readOnlyHint: true,
       },
       async ({ tagName }) => {
         try {
@@ -213,10 +221,14 @@ export class McpProvider implements Disposable {
     );
 
     server.tool(
-      'get-component-details-by-class-name',
+      'get-web-component-details-by-class-name',
       'Get detailed information about a specific web component by its class name. Returns complete component metadata including attributes, properties, methods, and events.',
       {
         className: z.string().describe('The class name of the component to get details for'),
+      },
+      {
+        title: 'Get Web Component Details by Class Name',
+        readOnlyHint: true,
       },
       async ({ className }) => {
         try {
@@ -257,10 +269,14 @@ export class McpProvider implements Disposable {
     );
 
     server.tool(
-      'list-all-components',
+      'list-all-web-components',
       'List all available web components in the workspace. Can return either basic information or full component details.',
       {
         includeDetails: z.boolean().optional().describe('Whether to include full component details (default: false)'),
+      },
+      {
+        title: 'List All Web Components',
+        readOnlyHint: true,
       },
       async ({ includeDetails = false }) => {
         try {
