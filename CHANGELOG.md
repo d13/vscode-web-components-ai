@@ -6,4 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-Initial development of the project.
+## 0.0.1
+
+### Added
+
+- Initial development of the project, super basic functionality.
+
+[unreleased]: https://github.com/gitkraken/vscode-gitlens/compare/v0.0.1...HEAD
