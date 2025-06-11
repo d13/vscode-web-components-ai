@@ -119,7 +119,9 @@
     "bundle:extension": "webpack --mode production --config-name extension:node",
     "generate:licenses": "node ./scripts/generateLicenses.mjs",
     "package": "vsce package --no-dependencies",
+    "package-pre": "pnpm run package --pre-release",
     "pub": "vsce publish --no-dependencies",
+    "pub-pre": "vsce publish --no-dependencies --pre-release",
     "watch": "webpack --watch --mode development",
     "vscode:prepublish": "pnpm run bundle"
   },
