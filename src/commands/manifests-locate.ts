@@ -3,6 +3,7 @@ import { Container } from '../container';
 import { command } from '../system/decorators/command';
 import { Logger } from '../system/logger';
 import { CommandBase } from './base';
+import { ManifestLocateOptions } from '../cem/locator';
 
 // @command('wcai.locateManifests')
 // export function locateManifests(_container: Container) {
@@ -17,7 +18,7 @@ export class LocateManifestsCommand extends CommandBase {
     super(container, 'wcai.manifests.locate');
   }
 
-  async execute() {
+  async execute(options?: ManifestLocateOptions) {
     window.withProgress(
       {
         location: ProgressLocation.Notification,
@@ -26,7 +27,7 @@ export class LocateManifestsCommand extends CommandBase {
       },
       async () => {
         return this.container.locator
-          .locate()
+          .locate(options)
           .then(manifests => {
             const message = `Located ${manifests.length} manifest files`;
             Logger.log(message);

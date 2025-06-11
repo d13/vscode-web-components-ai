@@ -31,7 +31,8 @@
     "virtualWorkspaces": false
   },
   "activationEvents": [
-    "onStartupFinished"
+    "workspaceContains:**/custom-elements.json",
+    "workspaceContains:**/package.json"
   ],
   "contributes": {
     "configuration": [
@@ -93,6 +94,11 @@
       }
     ],
     "commands": [
+      {
+        "command": "wcai.manifests.list",
+        "title": "List Custom Elements Manifests",
+        "category": "Web Components AI"
+      },
       {
         "command": "wcai.manifests.locate",
         "title": "Locate Custom Elements Manifests",

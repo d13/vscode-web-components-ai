@@ -18,6 +18,12 @@ export interface ParsedPackageFile {
   devDependencies?: Record<string, string>;
 }
 
+export interface ManifestLocateOptions {
+  force?: boolean;
+  silent?: boolean;
+  token?: CancellationToken;
+}
+
 // TODO: think about this API could be reused to build locators for other component frameworks in the future
 export class ManifestLocationProvider implements Disposable {
   private _disposables: Disposable[] = [];
@@ -43,7 +49,7 @@ export class ManifestLocationProvider implements Disposable {
     );
   }
 
-  async locate(options?: { force?: boolean; silent?: boolean; token?: CancellationToken }): Promise<Uri[]> {
+  async locate(options?: ManifestLocateOptions): Promise<Uri[]> {
     const { force, silent, token } = options ?? {};
 
     // TODO: add etag check for caching
