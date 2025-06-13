@@ -108,6 +108,16 @@
         "command": "wcai.mcp.showInformation",
         "title": "MCP Server Information",
         "category": "Web Components AI"
+      },
+      {
+        "command": "wcai.mcp.start",
+        "title": "Start MCP Server",
+        "category": "Web Components AI"
+      },
+      {
+        "command": "wcai.mcp.stop",
+        "title": "Stop MCP Server",
+        "category": "Web Components AI"
       }
     ]
   },
