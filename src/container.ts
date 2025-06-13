@@ -5,7 +5,7 @@ import { Logger } from './system/logger';
 import { memoize } from './system/decorators/memoize';
 import { ManifestLocationProvider } from './cem/locator';
 import { McpProvider } from './mcp/provider';
-import { CustomElementsManifestReader, ManifestsReader } from './cem/reader';
+import { CustomElementsManifestReader, ManifestsProvider } from './cem/reader';
 
 export class Container {
   static #instance: Container | undefined;
@@ -46,7 +46,7 @@ export class Container {
     ];
 
     disposables.push((this._locator = new ManifestLocationProvider(this)));
-    this._cem = new ManifestsReader(this);
+    this._cem = new ManifestsProvider(this);
     disposables.push((this._mcp = new McpProvider(this)));
 
     context.subscriptions.push({

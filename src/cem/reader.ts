@@ -12,9 +12,13 @@ export interface CustomElementsManifestReader {
   //   private ensureManifest(force?: boolean): Promise<boolean>;
 }
 
-export class ManifestsReader implements CustomElementsManifestReader {
+export class ManifestsProvider implements CustomElementsManifestReader {
   private manifests: ManifestReader[] | undefined = undefined;
-  constructor(private readonly _container: Container) {}
+  constructor(private readonly _container: Container) {
+    this._container.locator.onDidChange(e => {
+      this.manifests = this.manifests?.filter(m => e.includes(m.uri));
+    });
+  }
 
   private async ensureManifest(force?: boolean): Promise<boolean> {
     if (this.manifests !== undefined && !force) {
@@ -87,7 +91,11 @@ export class ManifestsReader implements CustomElementsManifestReader {
 
 export class ManifestReader implements CustomElementsManifestReader {
   private manifest: Package | undefined;
-  constructor(private readonly container: Container, private readonly uri: Uri) {}
+  constructor(private readonly container: Container, private readonly _uri: Uri) {}
+
+  get uri(): Uri {
+    return this._uri;
+  }
 
   private async ensureManifest(force: boolean = false): Promise<boolean> {
     if (this.manifest !== undefined && !force) {
@@ -95,7 +103,7 @@ export class ManifestReader implements CustomElementsManifestReader {
     }
 
     try {
-      const manifest = await workspace.fs.readFile(this.uri);
+      const manifest = await workspace.fs.readFile(this._uri);
       this.manifest = JSON.parse(manifest.toString());
       return true;
     } catch (error) {
