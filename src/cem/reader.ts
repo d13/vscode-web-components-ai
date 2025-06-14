@@ -1,5 +1,13 @@
 import { Uri, workspace } from 'vscode';
-import { Component, getAllComponents, getComponentByClassName, getComponentByTagName } from '@wc-toolkit/cem-utilities';
+import {
+  Component,
+  getAllComponents,
+  getComponentByClassName,
+  getComponentByTagName,
+  getComponentPublicMethods,
+  getComponentPublicProperties,
+  getPropertyOnlyFields,
+} from '@wc-toolkit/cem-utilities';
 import { Container } from '../container';
 import { Logger } from '../system/logger';
 import { Package } from 'custom-elements-manifest';
@@ -177,4 +185,34 @@ function filterComponents(
   }
 
   return components.filter(c => filterComponent(c, normalizedQuery));
+}
+
+export function getComponentDetails(component: Component, detail: 'basic' | 'public' | 'all' = 'public') {
+  switch (detail) {
+    case 'basic':
+      return getComponentBasicInfo(component);
+    case 'public':
+      return getComponentPublicApi(component);
+    case 'all':
+      return component;
+  }
+}
+
+function getComponentPublicApi(component: Component): Component {
+  const properties = getPropertyOnlyFields(component);
+  const methods = getComponentPublicMethods(component);
+  return {
+    ...component,
+    members: [...properties, ...methods],
+  };
+}
+
+function getComponentBasicInfo(component: Component): Component {
+  return {
+    name: component.name,
+    tagName: component.tagName,
+    className: component.className,
+    description: component.description,
+    customElement: component.customElement,
+  };
 }

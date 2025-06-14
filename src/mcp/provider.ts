@@ -6,6 +6,7 @@ import { Logger } from '../system/logger';
 import { z } from 'zod';
 import { executeCommand } from '../system/command';
 import { configuration } from '../system/configuration';
+import { getComponentDetails } from '../cem/reader';
 
 export const MANIFEST_SCHEME = 'manifest' as const;
 
@@ -97,7 +98,9 @@ export class McpProvider implements Disposable {
   private enrichMcpServer(server: McpServer): void {
     // Add server resources, tools, and prompts ...
     server.resource('manifest', `${MANIFEST_SCHEME}://components`, async (uri: URL) => {
-      const components = await this._container.cem.getAllComponents();
+      const components = (await this._container.cem.getAllComponents()).map(component =>
+        getComponentDetails(component),
+      );
       return {
         contents: [
           {
@@ -112,7 +115,10 @@ export class McpProvider implements Disposable {
       'manifest-components',
       new ResourceTemplate(`${MANIFEST_SCHEME}://components/{tag}`, { list: undefined }),
       async (uri: URL, variables) => {
-        const component = await this._container.cem.getComponentByTagName(variables.tag as string);
+        let component = await this._container.cem.getComponentByTagName(variables.tag as string);
+        if (component) {
+          component = getComponentDetails(component);
+        }
         return {
           contents: [
             {
@@ -127,7 +133,7 @@ export class McpProvider implements Disposable {
     // Add tools for web component development
     server.tool(
       'search-web-components',
-      'Search for web components by name, tag name, or description. Returns matching components with their basic information.',
+      'Search for web components by name, tag name, or description. Returns matching components with their full public API including attributes, properties, methods, and events.',
       {
         query: z.string().describe('Search term to find components by name, tag, or description'),
         matching: z
@@ -144,7 +150,9 @@ export class McpProvider implements Disposable {
       },
       async ({ query, matching }) => {
         try {
-          const matchingComponents = await this._container.cem.searchComponents(query, matching);
+          const matchingComponents = (await this._container.cem.searchComponents(query, matching)).map(component =>
+            getComponentDetails(component),
+          );
 
           return {
             content: [
@@ -174,7 +182,7 @@ export class McpProvider implements Disposable {
 
     server.tool(
       'get-web-component-details-by-tag-name',
-      'Get detailed information about a specific web component by its tag name. Returns complete component metadata including attributes, properties, methods, and events.',
+      'Get detailed information about a specific web component by its tag name. Returns the full public API of the component including attributes, properties, methods, and events.',
       {
         tagName: z.string().describe('The tag name of the component to get details for'),
       },
@@ -184,7 +192,7 @@ export class McpProvider implements Disposable {
       },
       async ({ tagName }) => {
         try {
-          const component = await this._container.cem.getComponentByTagName(tagName);
+          let component = await this._container.cem.getComponentByTagName(tagName);
 
           if (!component) {
             return {
@@ -198,6 +206,7 @@ export class McpProvider implements Disposable {
             };
           }
 
+          component = getComponentDetails(component);
           return {
             content: [
               {
@@ -222,7 +231,7 @@ export class McpProvider implements Disposable {
 
     server.tool(
       'get-web-component-details-by-class-name',
-      'Get detailed information about a specific web component by its class name. Returns complete component metadata including attributes, properties, methods, and events.',
+      'Get detailed information about a specific web component by its class name. Returns the full public API of the component including attributes, properties, methods, and events.',
       {
         className: z.string().describe('The class name of the component to get details for'),
       },
@@ -232,7 +241,7 @@ export class McpProvider implements Disposable {
       },
       async ({ className }) => {
         try {
-          const component = await this._container.cem.getComponentByClassName(className);
+          let component = await this._container.cem.getComponentByClassName(className);
 
           if (!component) {
             return {
@@ -246,6 +255,7 @@ export class McpProvider implements Disposable {
             };
           }
 
+          component = getComponentDetails(component);
           return {
             content: [
               {
@@ -270,25 +280,26 @@ export class McpProvider implements Disposable {
 
     server.tool(
       'list-all-web-components',
-      'List all available web components in the workspace. Can return either basic information or full component details.',
+      'List all available web components in the workspace. Can return just basic information or the full public API including attributes, properties, methods, and events.',
       {
-        includeDetails: z.boolean().optional().describe('Whether to include full component details (default: false)'),
+        includeDetails: z
+          .boolean()
+          .optional()
+          .describe(
+            'Whether to include the full public API for each component or just the tag name, class name, and description (default: true)',
+          ),
       },
       {
         title: 'List All Web Components',
         readOnlyHint: true,
       },
-      async ({ includeDetails = false }) => {
+      async ({ includeDetails = true }) => {
         try {
           const components = await this._container.cem.getAllComponents();
 
-          const componentList = includeDetails
-            ? components
-            : components.map(component => ({
-                tagName: component.tagName,
-                name: component.name,
-                description: component.description,
-              }));
+          const componentList = components.map(component =>
+            getComponentDetails(component, includeDetails ? 'public' : 'basic'),
+          );
 
           return {
             content: [
