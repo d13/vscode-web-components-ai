@@ -10,14 +10,14 @@ export interface ManifestPickerItem extends QuickPickItem {
 }
 
 export function createManifestPickerItem(uri: Uri): ManifestPickerItem {
-  const path = uri.fsPath;
+  const path = workspace.asRelativePath(uri, false);
   const idx = path.lastIndexOf('/');
   const name = idx !== -1 ? path.substring(idx + 1) : path;
   const description = idx !== -1 ? path.substring(0, idx) : undefined;
 
   return {
     label: name,
-    description: description ? stripWorkspaceFolder(Uri.file(description)) : undefined,
+    description: description ? description : undefined,
     alwaysShow: true,
     uri,
   };
@@ -80,16 +80,4 @@ export async function showManifestPicker(
   }
 
   return (selected as ManifestPickerItem)?.uri;
-}
-
-function stripWorkspaceFolder(uri: Uri): string {
-  const path = uri.fsPath;
-  const workspaceFolders = workspace.workspaceFolders;
-  for (const folder of workspaceFolders ?? []) {
-    const folderPath = folder.uri.fsPath;
-    if (path.startsWith(folderPath)) {
-      return path.slice(folderPath.length);
-    }
-  }
-  return path; // if no workspace folder matches, return the full path
 }
