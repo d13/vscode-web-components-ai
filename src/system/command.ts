@@ -1,4 +1,4 @@
-import type { Command, Disposable } from 'vscode';
+import type { Disposable } from 'vscode';
 import { commands } from 'vscode';
 import type { Commands, CoreCommands } from '../constants';
 import { Container } from '../container';

@@ -12,7 +12,6 @@ import { Container } from '../container';
 import { areEqual } from '../system/set';
 import { Logger } from '../system/logger';
 
-const emptyDisposable: Disposable = Object.freeze({ dispose: () => {} });
 export interface ParsedPackageFile {
   name: string;
   customElements: string;

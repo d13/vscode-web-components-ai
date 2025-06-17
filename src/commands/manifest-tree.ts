@@ -1,4 +1,4 @@
-import { Uri, window } from 'vscode';
+import { window } from 'vscode';
 import { Container } from '../container';
 import { command } from '../system/decorators/command';
 import { CommandBase } from './base';

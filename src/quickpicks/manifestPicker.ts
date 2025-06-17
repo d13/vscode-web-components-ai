@@ -1,6 +1,6 @@
 import { QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
 import { isPromise } from 'util/types';
-import { createQuickPickSeparator, QuickPickSeparator } from './common';
+import { createQuickPickSeparator } from './common';
 import { sortBy } from '../system/array';
 import { ManifestLocateOptions } from '../cem/locator';
 import { executeCommand } from '../system/command';

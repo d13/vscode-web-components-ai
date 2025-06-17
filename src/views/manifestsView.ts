@@ -1,4 +1,4 @@
-import { TreeItem, ProviderResult, Uri, TreeItemCollapsibleState, ThemeIcon } from 'vscode';
+import { TreeItem, ProviderResult, Uri } from 'vscode';
 import { ViewBase } from './base';
 import { ManifestItemNode } from './nodes/manifestItemNode';
 import { Container } from '../container';

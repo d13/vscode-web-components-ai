@@ -1,11 +1,7 @@
-import { QuickPickItem, Uri, window } from 'vscode';
 import { Container } from '../container';
 import { command } from '../system/decorators/command';
 import { CommandBase } from './base';
-import { createQuickPickSeparator } from '../quickpicks/common';
-import { executeCommand, executeCoreCommand } from '../system/command';
-import { ManifestLocateOptions } from '../cem/locator';
-import { sortBy } from '../system/array';
+import { executeCoreCommand } from '../system/command';
 import { showManifestPicker } from '../quickpicks/manifestPicker';
 
 @command()

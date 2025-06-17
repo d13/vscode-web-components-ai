@@ -1,6 +1,6 @@
 import { deferRegisteredCommand } from '../../system/command';
 import type { CommandConstructor } from '../../system/command';
-import type { Commands } from '../../constants';
+// import type { Commands } from '../../constants';
 
 // Boo, can't use decorators directly on functions
 // export function command(commands: Commands | Commands[]) {

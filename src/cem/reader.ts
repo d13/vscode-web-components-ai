@@ -5,7 +5,6 @@ import {
   getComponentByClassName,
   getComponentByTagName,
   getComponentPublicMethods,
-  getComponentPublicProperties,
   getPropertyOnlyFields,
 } from '@wc-toolkit/cem-utilities';
 import { Container } from '../container';
