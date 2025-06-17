@@ -1,4 +1,4 @@
-import { ConfigurationChangeEvent, Disposable, ExtensionContext, ExtensionMode } from 'vscode';
+import { ConfigurationChangeEvent, Disposable, ExtensionContext, ExtensionMode, window } from 'vscode';
 import { configuration } from './system/configuration';
 import { Storage } from './system/storage';
 import { Logger } from './system/logger';
@@ -6,6 +6,7 @@ import { memoize } from './system/decorators/memoize';
 import { ManifestLocationProvider } from './cem/locator';
 import { McpProvider } from './mcp/provider';
 import { CustomElementsManifestReader, ManifestsProvider } from './cem/reader';
+import { ManifestsView } from './views/manifestsView';
 
 export class Container {
   static #instance: Container | undefined;
@@ -49,6 +50,18 @@ export class Container {
     this._cem = new ManifestsProvider(this);
     disposables.push((this._mcp = new McpProvider(this)));
 
+    // Initialize tree view provider
+    this._manifestTreeProvider = new ManifestsView(this);
+    disposables.push(this._manifestTreeProvider);
+
+    // Register the tree view
+    disposables.push(
+      window.createTreeView('wcai.views.cemList', {
+        treeDataProvider: this._manifestTreeProvider,
+        showCollapseAll: true,
+      }),
+    );
+
     context.subscriptions.push({
       dispose: function () {
         disposables.reverse().forEach(d => void d.dispose());
@@ -79,6 +92,11 @@ export class Container {
   private _locator: ManifestLocationProvider;
   get locator() {
     return this._locator;
+  }
+
+  private _manifestTreeProvider: ManifestsView;
+  get manifestTreeProvider() {
+    return this._manifestTreeProvider;
   }
 
   private _mcp: McpProvider;

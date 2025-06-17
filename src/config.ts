@@ -2,6 +2,9 @@ import { LogLevel } from './system/logger.constants';
 
 export interface Config {
   readonly outputLevel: LogLevel;
+  readonly manifests: {
+    readonly exclude: string[];
+  };
   readonly mcp: {
     readonly port: number | null;
     readonly host: string | null;

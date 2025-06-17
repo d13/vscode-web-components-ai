@@ -65,6 +65,23 @@
         }
       },
       {
+        "id": "manifests",
+        "title": "Custom Elements Manifests",
+        "order": 5,
+        "properties": {
+          "wcai.manifests.exclude": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "List of manifest file URIs to exclude from processing and display.",
+            "scope": "window",
+            "order": 10
+          }
+        }
+      },
+      {
         "id": "mcp",
         "title": "Model Context Protocol (MCP) Server",
         "order": 10,
@@ -118,8 +135,64 @@
         "command": "wcai.mcp.stop",
         "title": "Stop MCP Server",
         "category": "Web Components AI"
+      },
+      {
+        "command": "wcai.views.cemList.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "wcai.views.cemList.include",
+        "title": "Include Manifest",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "wcai.views.cemList.exclude",
+        "title": "Exclude Manifest",
+        "icon": "$(eye-closed)"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "web-components-ai",
+          "title": "Web Components AI",
+          "icon": "images/wcai-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "web-components-ai": [
+        {
+          "id": "wcai.views.cemList",
+          "name": "Manifests",
+          "type": "tree",
+          "contextualTitle": "WCAI",
+          "icon": "$(file-code)"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "wcai.views.cemList.refresh",
+          "when": "view == wcai.views.cemList",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "wcai.views.cemList.include",
+          "when": "view == wcai.views.cemList && viewItem == manifestExcluded",
+          "group": "inline"
+        },
+        {
+          "command": "wcai.views.cemList.exclude",
+          "when": "view == wcai.views.cemList && viewItem == manifestIncluded",
+          "group": "inline"
+        }
+      ]
+    }
   },
   "main": "./dist/extension.js",
   "scripts": {

@@ -6,6 +6,7 @@ import {
   Disposable,
   Event,
   CancellationToken,
+  WorkspaceFolder,
 } from 'vscode';
 import { Container } from '../container';
 import { areEqual } from '../system/set';
@@ -13,6 +14,7 @@ import { Logger } from '../system/logger';
 
 const emptyDisposable: Disposable = Object.freeze({ dispose: () => {} });
 export interface ParsedPackageFile {
+  name: string;
   customElements: string;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
@@ -24,11 +26,20 @@ export interface ManifestLocateOptions {
   token?: CancellationToken;
 }
 
+export interface ManifestSource {
+  uri: Uri;
+  workspaceFolder?: WorkspaceFolder;
+  packageJson?: Uri;
+  dependencyName?: string;
+  isLocal: boolean;
+}
+
 // TODO: think about this API could be reused to build locators for other component frameworks in the future
 export class ManifestLocationProvider implements Disposable {
   private _disposables: Disposable[] = [];
   // TODO: this should be in workspace storage
   private _manifestUris: Set<Uri> | undefined = undefined;
+  private _manifestSources: Map<string, ManifestSource[]> = new Map();
 
   private _etag: number | undefined = undefined;
   get etag() {
@@ -55,6 +66,7 @@ export class ManifestLocationProvider implements Disposable {
     // TODO: add etag check for caching
     if (force === true || this._manifestUris === undefined) {
       const manifestUrisSet = new Set<Uri>();
+      this._manifestSources.clear();
 
       const localPackages = await this.findLocalPackages();
       for (const uri of localPackages) {
@@ -89,6 +101,32 @@ export class ManifestLocationProvider implements Disposable {
     return await this.locate();
   }
 
+  getManifestSources(uri: Uri): ManifestSource[] | undefined {
+    return this._manifestSources.get(uri.toString());
+  }
+
+  getAllManifestSources(): Map<string, ManifestSource[]> {
+    return new Map(this._manifestSources);
+  }
+
+  private addManifestSource(uri: Uri, source: ManifestSource): void {
+    const key = uri.toString();
+    const sources = this._manifestSources.get(key) || [];
+
+    // Check if this exact source already exists
+    const exists = sources.some(
+      s =>
+        s.isLocal === source.isLocal &&
+        s.packageJson?.toString() === source.packageJson?.toString() &&
+        s.dependencyName === source.dependencyName,
+    );
+
+    if (!exists) {
+      sources.push(source);
+      this._manifestSources.set(key, sources);
+    }
+  }
+
   private async findLocalPackages(): Promise<Uri[]> {
     const localPackages: Uri[] = [];
 
@@ -106,7 +144,18 @@ export class ManifestLocationProvider implements Disposable {
     const localManifests: Uri[] = [];
     try {
       const files = await workspace.findFiles('**/custom-elements.json', '**/node_modules/**/custom-elements.json');
-      localManifests.push(...files);
+
+      for (const uri of files) {
+        localManifests.push(uri);
+
+        // Track source information for local manifests
+        const workspaceFolder = workspace.getWorkspaceFolder(uri);
+        this.addManifestSource(uri, {
+          uri,
+          workspaceFolder,
+          isLocal: true,
+        });
+      }
     } catch (error) {
       Logger.error(error, 'ManifestLocationProvider.findLocalManifests');
     }
@@ -114,18 +163,28 @@ export class ManifestLocationProvider implements Disposable {
   }
 
   private async findManifestsFromPackage(
-    uri: Uri,
-    options?: { includeDependencies?: boolean; token?: CancellationToken },
+    packageUri: Uri,
+    options?: { isLocal?: boolean; includeDependencies?: boolean; token?: CancellationToken },
   ): Promise<Uri[]> {
     const manifests: Uri[] = [];
+    const workspaceFolder = workspace.getWorkspaceFolder(packageUri);
 
     try {
-      const packageJson = await workspace.fs.readFile(uri);
+      const packageJson = await workspace.fs.readFile(packageUri);
       const packageData = JSON.parse(packageJson.toString()) as ParsedPackageFile;
 
       if (packageData.customElements) {
-        const manifestUri = Uri.joinPath(uri, '../', packageData.customElements);
+        const manifestUri = Uri.joinPath(packageUri, '../', packageData.customElements);
         manifests.push(manifestUri);
+
+        // Track source information for package manifest
+        this.addManifestSource(manifestUri, {
+          uri: manifestUri,
+          workspaceFolder,
+          packageJson: packageUri,
+          dependencyName: packageData.name,
+          isLocal: options?.isLocal ?? true,
+        });
       }
 
       if (options?.includeDependencies) {
@@ -135,13 +194,25 @@ export class ManifestLocationProvider implements Disposable {
         };
 
         for (const dep of Object.keys(dependencies)) {
-          const packageUri = Uri.joinPath(uri, '../', 'node_modules', dep, 'package.json');
-          const depManifests = await this.findManifestsFromPackage(packageUri, {
+          const depPackageUri = Uri.joinPath(packageUri, '../', 'node_modules', dep, 'package.json');
+          const depManifests = await this.findManifestsFromPackage(depPackageUri, {
+            isLocal: false,
             includeDependencies: false,
             token: options.token,
           });
+
           if (depManifests.length > 0) {
             manifests.push(...depManifests);
+            // Update source information for dependency manifests
+            // for (const manifestUri of depManifests) {
+            //   this.addManifestSource(manifestUri, {
+            //     uri: manifestUri,
+            //     workspaceFolder,
+            //     packageJson: depPackageUri,
+            //     dependencyName: dep,
+            //     isLocal: false,
+            //   });
+            // }
           }
         }
       }
