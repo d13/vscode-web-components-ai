@@ -3,7 +3,7 @@ import { Container } from '../container';
 import { command } from '../system/decorators/command';
 import { CommandBase } from './base';
 import { createQuickPickSeparator } from '../quickpicks/common';
-import { executeCommand } from '../system/command';
+import { executeCommand, executeCoreCommand } from '../system/command';
 import { ManifestLocateOptions } from '../cem/locator';
 import { sortBy } from '../system/array';
 import { showManifestPicker } from '../quickpicks/manifestPicker';
@@ -28,10 +28,13 @@ export class ListManifestsCommand extends CommandBase {
       },
     });
 
-    // if (pick === undefined) {
-    //   return;
-    // }
+    if (pick === undefined) {
+      return;
+    }
 
-    // TODO: show quick picks to exclude or include the manifest
+    // open the uri in the editor
+    void executeCoreCommand('vscode.open', pick, {
+      preserveFocus: true,
+    });
   }
 }
