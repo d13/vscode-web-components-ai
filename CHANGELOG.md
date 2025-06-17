@@ -6,10 +6,31 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-## 0.0.1
+## [0.0.2]
+
+### Added
+
+- Added _Manifests_ view and _Web Component AI Tools_ sidebar
+  - See all discovered CEM files, organized by local and dependencies.
+  - Control whether CEM files are excluded from the MCP server.
+  - Open CEM files in the editor.
+  - Refresh discovered CEM files.
+- Added _Start MCP Server_ and _Stop MCP Server_ commands to the command palette.
+
+### Changed
+
+- Updated _List Custom Elements Manifests_ command to open CEM files in the editor when selected.
+
+### Fixed
+
+- Fixed sending private member data from CEM files to MCP clients.
+
+## [0.0.1]
 
 ### Added
 
 - Initial development of the project, super basic functionality.
 
-[unreleased]: https://github.com/gitkraken/vscode-gitlens/compare/v0.0.1...HEAD
+[unreleased]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.1...v0.0.2
+[0.0.1]: https://github.com/d13/vscode-web-components-ai/tree/v0.0.1
