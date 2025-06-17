@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Added
 
-- Added _Manifests_ view and _Web Component AI Tools_ sidebar
+- Added _Manifests_ view and _Web Component AI Tools_ sidebar ([#2](https://github.com/d13/vscode-web-components-ai/issues/2), [#6](https://github.com/d13/vscode-web-components-ai/issues/6))
   - See all discovered CEM files, organized by local and dependencies.
   - Control whether CEM files are excluded from the MCP server.
   - Open CEM files in the editor.
@@ -31,7 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Fixed
 
-- Fixed sending private member data from CEM files to MCP clients.
+- Fixed sending private member data from CEM files to MCP clients. ([#5](https://github.com/d13/vscode-web-components-ai/issues/5))
 
 ## [0.0.1]
 
