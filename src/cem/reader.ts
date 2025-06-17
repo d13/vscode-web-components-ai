@@ -9,6 +9,7 @@ import {
 } from '@wc-toolkit/cem-utilities';
 import { Container } from '../container';
 import { Logger } from '../system/logger';
+import { configuration } from '../system/configuration';
 import { Package } from 'custom-elements-manifest';
 
 export interface CustomElementsManifestReader {
@@ -16,7 +17,6 @@ export interface CustomElementsManifestReader {
   getComponentByTagName(tag: string): Promise<Component | undefined>;
   getComponentByClassName(className: string): Promise<Component | undefined>;
   searchComponents(query: string, matching?: 'strict' | 'all' | 'any'): Promise<Component[]>;
-  //   private ensureManifest(force?: boolean): Promise<boolean>;
 }
 
 export class ManifestsProvider implements CustomElementsManifestReader {
@@ -24,6 +24,14 @@ export class ManifestsProvider implements CustomElementsManifestReader {
   constructor(private readonly _container: Container) {
     this._container.locator.onDidChange(e => {
       this.manifests = this.manifests?.filter(m => e.includes(m.uri));
+    });
+
+    // Listen for configuration changes to exclude manifests
+    configuration.onDidChangeAny(e => {
+      if (e.affectsConfiguration('wcai.manifests.exclude')) {
+        // Force refresh when exclude configuration changes
+        this.manifests = undefined;
+      }
     });
   }
 
@@ -33,8 +41,13 @@ export class ManifestsProvider implements CustomElementsManifestReader {
     }
 
     const uris = await this._container.locator.getManifests();
-    this.manifests = uris.map(u => new ManifestReader(this._container, u));
-    if (uris.length > 0) {
+    const excludeConfig = configuration.get('manifests.exclude');
+
+    // Filter out excluded manifests
+    const filteredUris = uris.filter(uri => !excludeConfig.includes(uri.toString()));
+
+    this.manifests = filteredUris.map(u => new ManifestReader(this._container, u));
+    if (filteredUris.length > 0) {
       return true;
     }
 
