@@ -23,7 +23,7 @@ export class ManifestsProvider implements CustomElementsManifestReader {
   private manifests: ManifestReader[] | undefined = undefined;
   constructor(private readonly _container: Container) {
     this._container.locator.onDidChange(e => {
-      this.manifests = this.manifests?.filter(m => e.includes(m.uri));
+      this.manifests = undefined;
     });
 
     // Listen for configuration changes to exclude manifests
