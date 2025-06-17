@@ -2,17 +2,20 @@
 
 Supercharge your AI coding assistants with web component information from your workspace and dependencies. Generate accurate component code using your actual custom elements, properties, and APIs.
 
-This VS Code extension automatically discovers Custom Elements Manifests in your workspace and dependencies, then starts a local Model Context Protocol (MCP) server that AI assistants can connect to for intelligent web component development.
+## 🚀 Benefits
+
+- **Accelerate UI development** by facilitating AI agents to build using your custom elements and web component libraries
+- **Expose documentation** of your web components and libraries through AI chat
 
 ## ✨ Features
 
 ### 🔍 **Automatic Component Discovery**
 
+- Discovers components from both local code and installed packages
 - Scans your workspace for `custom-elements.json` manifest files
 - Analyzes `package.json` files to find component libraries in dependencies
-- Discovers components from both local code and installed packages
 
-### 🚀 **Model Context Protocol Server**
+### 📡 **Model Context Protocol Server**
 
 - Starts a local MCP server with multiple transport options (HTTP and SSE)
 - Provides real-time access to component information for AI assistants
@@ -20,7 +23,7 @@ This VS Code extension automatically discovers Custom Elements Manifests in your
 
 ### 🤖 **AI Assistant Integration**
 
-- Compatible with Claude Desktop, Cline, and other MCP-enabled AI tools
+- Compatible with Copilot, Cursor, Windsurf, Claude Code, and other MCP-enabled AI tools
 - Provides rich component context for accurate code generation
 - Enables AI assistants to understand your specific component APIs
 
@@ -31,73 +34,19 @@ This VS Code extension automatically discovers Custom Elements Manifests in your
 - **List All Components**: Browse all available components in your workspace
 - **Component Resources**: Access structured component data via MCP resources
 
-## 🔧 How It Works
-
-1. **Discovery**: The extension scans your workspace for:
-
-   - `custom-elements.json` files (Custom Elements Manifest standard)
-   - `package.json` files with `customElements` field pointing to manifest files
-   - Component libraries in `node_modules` with their own manifests
-
-2. **Analysis**: Parses manifest files to extract detailed component information:
-
-   - Tag names and class names
-   - Properties, attributes, methods, and events
-   - Documentation and type information
-   - Inheritance relationships
-
-3. **MCP Server**: Starts a local server that exposes this data through:
-   - RESTful HTTP endpoints for streaming responses
-   - Server-Sent Events (SSE) for real-time updates
-   - Structured resources and tools for AI assistant consumption
-
 ## 🚀 Getting Started
 
 ### Installation
 
-1. Install the extension from the VS Code Marketplace
-2. Open a workspace containing web components or component libraries
-3. The extension will automatically start and discover your components
+Install this extension by clicking `Install` on the banner above, or from the Extensions side bar in VS Code by searching for `d13.vscode-web-components-ai`.
+
+> Be sure to have VS Code 1.99.0 or higher installed.
 
 ### AI Assistant Integration
 
-When the extension starts, it will show a notification with MCP server details and configuration. Click "Copy Config" to get the configuration for your AI assistant.
+See the **[Integrating with the MCP Server](https://github.com/d13/vscode-web-components-ai/blob/main/docs/configure-mcp.md)** guide on how to integrate with your preferred AI assistants including Copilot, Cursor, Windsurf, Claude Code, and many more.
 
-#### Claude Desktop Integration
-
-1. Copy the MCP configuration from the VS Code notification
-2. Open your Claude Desktop configuration file:
-   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-3. Add the server configuration to your `mcpServers` section:
-
-```json
-{
-  "mcpServers": {
-    "mcp-wcai-http": {
-      "type": "http",
-      "url": "http://localhost:3000/mcp"
-    },
-    "mcp-wcai-sse": {
-      "type": "sse",
-      "url": "http://localhost:3000/sse"
-    }
-  }
-}
-```
-
-4. Restart Claude Desktop
-
-#### Cline Integration
-
-1. In VS Code, open Cline settings
-2. Navigate to MCP servers configuration
-3. Add the server configuration copied from the notification
-4. Restart Cline
-
-#### Other MCP-Compatible AI Assistants
-
-The extension provides standard MCP endpoints that work with any MCP-compatible AI assistant. Use the configuration format appropriate for your specific tool.
+> Have questions or concerns? Let's talk directly through the [GitHub Discussions page](https://github.com/d13/vscode-web-components-ai/discussions). Having a positive experience? Feel free to [write a review](https://marketplace.visualstudio.com/items?itemName=d13.vscode-web-components-ai&ssr=false#review-details).
 
 ## 🛠️ Available Tools & Resources
 
@@ -113,10 +62,19 @@ The extension provides standard MCP endpoints that work with any MCP-compatible 
 - **`manifest://components`**: Access to all component data in JSON format
 - **`manifest://components/{tag}`**: Access to specific component data by tag name
 
-## 📋 Requirements
+## 🤝 Community
 
-- VS Code 1.99.0 or higher
-- Workspace containing web components with Custom Elements Manifests
+### Discussions & Feedback
+
+If you have any questions or want to share your experiences, please join-in on our [GitHub Discussions page](https://github.com/d13/vscode-web-components-ai/discussions).
+
+### Issues & Feature Requests
+
+If you encounter any issues or have feature requests, please report them on the [GitHub Issues page](https://github.com/d13/vscode-web-components-ai/issues).
+
+### Contributing
+
+We welcome contributions! Please see our [Contributing Guide](https://github.com/d13/vscode-web-components-ai/blob/main/CONTRIBUTING.md) for more information.
 
 ## 🔗 Related Projects
 
