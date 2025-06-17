@@ -24,7 +24,7 @@ export class McpInformationCommand extends CommandBase {
     if (result === copyConfig) {
       const configString = JSON.stringify(
         {
-          servers: {
+          mcpServers: {
             'mcp-wcai-http': {
               type: 'http',
               url: serverInfo.mcpUrl,

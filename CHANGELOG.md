@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added documentation for configuring the MCP server with VS Code, Cursor, Claude Code, and other AI assistants ([#7](https://github.com/d13/vscode-web-components-ai/issues/7))
 
+### Changed
+
+- Updated the JSON format when using the _Copy Config JSON_ in the _MCP Server Information_ command to match the standard MCP format.
+
 ## [0.0.2]
 
 ### Added
