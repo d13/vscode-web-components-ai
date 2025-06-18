@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.0.3] - 2025-06-18
+
 ### Added
 
 - Added documentation for configuring the MCP server with VS Code, Cursor, Claude Code, and other AI assistants ([#7](https://github.com/d13/vscode-web-components-ai/issues/7))
@@ -13,8 +15,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Changed
 
 - Updated the JSON format when using the _Copy Config JSON_ in the _MCP Server Information_ command to match the standard MCP format.
+- Updated manifest readers to better cache and invalidate CEM files, improving performance, accuracy and reliability.
 
-## [0.0.2]
+## [0.0.2] - 2025-06-18
 
 ### Added
 
@@ -33,12 +36,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed sending private member data from CEM files to MCP clients. ([#5](https://github.com/d13/vscode-web-components-ai/issues/5))
 
-## [0.0.1]
+## [0.0.1] - 2025-06-11
 
 ### Added
 
 - Initial development of the project, super basic functionality.
 
-[unreleased]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.2...HEAD
+[unreleased]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.3...HEAD
+[0.0.3]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/d13/vscode-web-components-ai/tree/v0.0.1
