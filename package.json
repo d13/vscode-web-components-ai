@@ -21,6 +21,10 @@
     "url": "https://github.com/d13/vscode-web-components-ai.git",
     "type": "git"
   },
+  "galleryBanner": {
+    "color": "#181c21",
+    "theme": "dark"
+  },
   "icon": "images/wcai-icon.png",
   "engines": {
     "node": "^20.18.3",
