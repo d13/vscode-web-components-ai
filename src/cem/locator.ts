@@ -1,16 +1,8 @@
-import {
-  Uri,
-  EventEmitter,
-  workspace,
-  WorkspaceFoldersChangeEvent,
-  Disposable,
-  Event,
-  CancellationToken,
-  WorkspaceFolder,
-} from 'vscode';
-import { Container } from '../container';
-import { areEqual } from '../system/set';
+import type { WorkspaceFoldersChangeEvent, Disposable, Event, CancellationToken, WorkspaceFolder } from 'vscode';
+import { Uri, EventEmitter, workspace } from 'vscode';
+import type { Container } from '../container';
 import { Logger } from '../system/logger';
+import { areEqual } from '../system/set';
 
 export interface ParsedPackageFile {
   name: string;

@@ -1,9 +1,10 @@
-import { QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
 import { isPromise } from 'util/types';
-import { createQuickPickSeparator } from './common';
+import type { QuickPickItem, QuickPickOptions, Uri } from 'vscode';
+import { window, workspace } from 'vscode';
+import type { ManifestLocateOptions } from '../cem/locator';
 import { sortBy } from '../system/array';
-import { ManifestLocateOptions } from '../cem/locator';
 import { executeCommand } from '../system/command';
+import { createQuickPickSeparator } from './common';
 
 export interface ManifestPickerItem extends QuickPickItem {
   uri: Uri;

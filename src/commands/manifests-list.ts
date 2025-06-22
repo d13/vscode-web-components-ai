@@ -1,8 +1,8 @@
-import { Container } from '../container';
+import type { Container } from '../container';
+import { showManifestPicker } from '../quickpicks/manifestPicker';
+import { executeCoreCommand } from '../system/command';
 import { command } from '../system/decorators/command';
 import { CommandBase } from './base';
-import { executeCoreCommand } from '../system/command';
-import { showManifestPicker } from '../quickpicks/manifestPicker';
 
 @command()
 export class ListManifestsCommand extends CommandBase {

@@ -1,9 +1,9 @@
 import { window } from 'vscode';
-import { Container } from '../container';
-import { command } from '../system/decorators/command';
-import { CommandBase } from './base';
-import { ManifestItemNode } from '../views/nodes/manifestItemNode';
+import type { Container } from '../container';
 import { configuration } from '../system/configuration';
+import { command } from '../system/decorators/command';
+import { ManifestItemNode } from '../views/nodes/manifestItemNode';
+import { CommandBase } from './base';
 
 @command()
 export class RefreshManifestTreeCommand extends CommandBase {

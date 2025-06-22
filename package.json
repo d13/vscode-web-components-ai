@@ -201,16 +201,20 @@
   "main": "./dist/extension.js",
   "scripts": {
     "build": "webpack --mode development",
-    "clean": "pnpx rimraf dist out .vscode-test .vscode-test-web .eslintcache* tsconfig*.tsbuildinfo",
     "bundle": "webpack --mode production",
     "bundle:extension": "webpack --mode production --config-name extension:node",
+    "clean": "pnpx rimraf dist out .vscode-test .vscode-test-web .eslintcache* tsconfig*.tsbuildinfo",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "generate:licenses": "node ./scripts/generateLicenses.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "package": "vsce package --no-dependencies",
     "package-pre": "pnpm run package --pre-release",
     "pub": "vsce publish --no-dependencies",
     "pub-pre": "vsce publish --no-dependencies --pre-release",
-    "watch": "webpack --watch --mode development",
-    "vscode:prepublish": "pnpm run bundle"
+    "vscode:prepublish": "pnpm run bundle",
+    "watch": "webpack --watch --mode development"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.3",
@@ -219,13 +223,22 @@
     "zod": "^3.25.32"
   },
   "devDependencies": {
+    "@eslint/js": "^9.29.0",
     "@types/node": "^22.15.17",
     "@types/vscode": "1.99.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.1",
+    "@typescript-eslint/parser": "^8.34.1",
     "@vscode/vsce": "^3.5.0",
     "copy-webpack-plugin": "^13.0.0",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-import-resolver-typescript": "^4.4.3",
+    "eslint-plugin-import": "^2.32.0",
     "license-checker-rseidelsohn": "^4.4.2",
+    "prettier": "^3.5.3",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.1",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1"
   },

@@ -1,4 +1,4 @@
-import { Container } from '../container';
+import type { Container } from '../container';
 import { command } from '../system/decorators/command';
 import { CommandBase } from './base';
 
@@ -9,7 +9,7 @@ export class McpStartCommand extends CommandBase {
   }
 
   async execute() {
-    void this._container.mcp.start();
+    await this._container.mcp.start();
   }
 }
 
@@ -20,6 +20,6 @@ export class McpStopCommand extends CommandBase {
   }
 
   async execute() {
-    void this._container.mcp.stop();
+    await this._container.mcp.stop();
   }
 }

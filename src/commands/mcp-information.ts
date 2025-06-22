@@ -1,7 +1,7 @@
 import { window, env } from 'vscode';
-import { Container } from '../container';
-import { CommandBase } from './base';
+import type { Container } from '../container';
 import { command } from '../system/decorators/command';
+import { CommandBase } from './base';
 
 @command()
 export class McpInformationCommand extends CommandBase {

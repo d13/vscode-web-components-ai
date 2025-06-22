@@ -1,0 +1,37 @@
+{
+  // Editor settings
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+
+  // File associations and excludes
+  "files.exclude": {
+    "**/.vscode-test": true,
+    "**/.vscode-test-web": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.vscode-test": true,
+    "**/.vscode-test-web": true,
+    "**/*.vsix": true
+  },
+
+  // Extension development specific
+  "debug.allowBreakpointsEverywhere": true,
+
+  // Language specific settings
+  "[html][javascript][json][jsonc][markdown][scss][svg][typescript][typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on"
+  },
+  "typescript.preferences.importModuleSpecifier": "project-relative",
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.updateImportsOnFileMove.enabled": "always"
+}

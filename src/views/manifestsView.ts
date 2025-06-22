@@ -1,11 +1,11 @@
-import { TreeItem, ProviderResult, Uri } from 'vscode';
-import { ViewBase } from './base';
-import { ManifestItemNode } from './nodes/manifestItemNode';
-import { Container } from '../container';
-import { configuration } from '../system/configuration';
+import type { TreeItem, ProviderResult, Uri } from 'vscode';
+import type { Container } from '../container';
 import { executeCommand } from '../system/command';
-import { ManifestGroupedItemNode } from './nodes/manifestGroupedItemNode';
+import { configuration } from '../system/configuration';
+import { ViewBase } from './base';
 import { LoadingNode } from './nodes/loadingNode';
+import { ManifestGroupedItemNode } from './nodes/manifestGroupedItemNode';
+import { ManifestItemNode } from './nodes/manifestItemNode';
 
 type ManifestTreeElement = ManifestItemNode | ManifestGroupedItemNode | LoadingNode;
 

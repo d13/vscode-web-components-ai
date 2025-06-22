@@ -1,11 +1,12 @@
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import type { IncomingMessage, Server, ServerResponse } from 'http';
+import { createServer } from 'http';
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { uuid } from '@env/crypto';
-import { createMcpServer } from './server';
 import { Logger } from '../../system/logger';
+import { createMcpServer } from './server';
 
 export interface HttpTransportInfo {
   httpServer: Server<typeof IncomingMessage, typeof ServerResponse>;
@@ -100,7 +101,7 @@ export async function createHttpTransport(
         });
       });
     } catch (ex) {
-      reject(ex);
+      reject(ex as Error);
     }
   });
 }
@@ -127,7 +128,7 @@ async function handleStreamableRequest(
 
   try {
     bodyData = JSON.parse(bodyString);
-  } catch (error) {
+  } catch (_error) {
     res.statusCode = 400;
     res.end(
       JSON.stringify({
@@ -235,7 +236,7 @@ async function handleRequest(
  * @param options Optional configuration for the MCP server.
  */
 async function handleSSEConnection(
-  req: IncomingMessage,
+  _req: IncomingMessage,
   res: ServerResponse,
   mcpCallback: (server: McpServer) => void,
   sseTransports: Map<string, SSEServerTransport>,
@@ -305,7 +306,7 @@ async function handleSSEMessage(
 
   try {
     bodyData = JSON.parse(bodyString);
-  } catch (error) {
+  } catch (_error) {
     res.statusCode = 400;
     res.end(JSON.stringify({ message: 'Invalid JSON' }));
     return;
@@ -324,7 +325,7 @@ async function parseRequestBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Uint8Array[] = [];
     req.on('data', d => chunks.push(d));
-    req.on('end', async () => {
+    req.on('end', () => {
       const body = Buffer.concat(chunks).toString();
       resolve(body);
     });

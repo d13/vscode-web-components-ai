@@ -1,12 +1,14 @@
-import { Disposable } from 'vscode';
-import { Container } from '../container';
-import { createHttpTransport, HttpTransportInfo } from './utils/transport';
-import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { Logger } from '../system/logger';
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { Disposable } from 'vscode';
 import { z } from 'zod';
+import { getComponentDetails } from '../cem/reader';
+import type { Container } from '../container';
 import { executeCommand } from '../system/command';
 import { configuration } from '../system/configuration';
-import { getComponentDetails } from '../cem/reader';
+import { Logger } from '../system/logger';
+import type { HttpTransportInfo } from './utils/transport';
+import { createHttpTransport } from './utils/transport';
 
 export const MANIFEST_SCHEME = 'manifest' as const;
 

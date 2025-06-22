@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { resolveProp } from './resolver';
 
 export function memoize<T extends (...arg: any) => any>(resolver?: (...args: Parameters<T>) => string) {
-  return (target: any, key: string, descriptor: PropertyDescriptor & Record<string, any>) => {
+  return (_target: any, key: string, descriptor: PropertyDescriptor & Record<string, any>) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     let fn: Function | undefined;
     let fnKey: string | undefined;
 
@@ -29,7 +29,7 @@ export function memoize<T extends (...arg: any) => any>(resolver?: (...args: Par
         return result;
       }
 
-      result = fn!.apply(this, args);
+      result = fn.apply(this, args);
       Object.defineProperty(this, prop, {
         configurable: false,
         enumerable: false,

@@ -1,4 +1,4 @@
-import { LogLevel } from './logger.constants';
+import type { LogLevel } from './logger.constants';
 import type { LogScope } from './logger.scope';
 
 const emptyStr = '';

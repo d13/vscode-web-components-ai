@@ -1,8 +1,8 @@
 import type { Disposable } from 'vscode';
 import { commands } from 'vscode';
+import type { CommandBase } from '../commands/base';
 import type { Commands, CoreCommands } from '../constants';
-import { Container } from '../container';
-import { CommandBase } from '../commands/base';
+import type { Container } from '../container';
 
 // Need the ability to register commands that are in the package.json
 //   these commands and their arguments need to be strongly typed

@@ -1,4 +1,4 @@
-import { LogLevel } from './system/logger.constants';
+import type { LogLevel } from './system/logger.constants';
 
 export interface Config {
   readonly outputLevel: LogLevel;

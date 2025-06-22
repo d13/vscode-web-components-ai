@@ -1,11 +1,12 @@
 import { env } from 'process';
-import { ExtensionContext, window, Uri, ExtensionMode, version } from 'vscode';
+import type { ExtensionContext } from 'vscode';
+import { window, Uri, ExtensionMode, version } from 'vscode';
 import { isWeb } from '@env/platform';
+import { Container } from './container';
+import { registerDeferredCommands } from './system/command';
+import { configuration, Configuration } from './system/configuration';
 import { Logger } from './system/logger';
 import { satisfies } from './system/version';
-import { Container } from './container';
-import { configuration, Configuration } from './system/configuration';
-import { registerDeferredCommands } from './system/command';
 import './commands';
 
 export function activate(context: ExtensionContext) {

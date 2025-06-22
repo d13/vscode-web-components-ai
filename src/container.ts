@@ -1,19 +1,20 @@
-import { ConfigurationChangeEvent, Disposable, ExtensionContext, ExtensionMode, window } from 'vscode';
-import { configuration } from './system/configuration';
-import { Storage } from './system/storage';
-import { Logger } from './system/logger';
-import { memoize } from './system/decorators/memoize';
+import type { ConfigurationChangeEvent, Disposable, ExtensionContext } from 'vscode';
+import { ExtensionMode, window } from 'vscode';
 import { ManifestLocationProvider } from './cem/locator';
+import type { CustomElementsManifestReader } from './cem/reader';
+import { ManifestsProvider } from './cem/reader';
 import { McpProvider } from './mcp/provider';
-import { CustomElementsManifestReader, ManifestsProvider } from './cem/reader';
+import { configuration } from './system/configuration';
+import { memoize } from './system/decorators/memoize';
+import { Logger } from './system/logger';
+import { Storage } from './system/storage';
 import { ManifestsView } from './views/manifestsView';
 
 export class Container {
   static #instance: Container | undefined;
   static #proxy = new Proxy<Container>({} as Container, {
-    get: function (target, prop) {
+    get: function (_target, prop) {
       // In case anyone has cached this instance
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       if (Container.#instance != null) return (Container.#instance as any)[prop];
 
       // Allow access to config before we are initialized

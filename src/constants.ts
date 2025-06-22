@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export const extensionPrefix = 'wcai';
 
 export type SecretKeys = string;

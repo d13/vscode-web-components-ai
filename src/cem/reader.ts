@@ -1,16 +1,17 @@
-import { Uri, workspace, FileSystemWatcher, Disposable, EventEmitter, Event } from 'vscode';
+import type { Component } from '@wc-toolkit/cem-utilities';
 import {
-  Component,
   getAllComponents,
   getComponentByClassName,
   getComponentByTagName,
   getComponentPublicMethods,
   getPropertyOnlyFields,
 } from '@wc-toolkit/cem-utilities';
-import { Container } from '../container';
-import { Logger } from '../system/logger';
+import type { Package } from 'custom-elements-manifest';
+import type { Disposable, Event, FileSystemWatcher, Uri } from 'vscode';
+import { EventEmitter, workspace } from 'vscode';
+import type { Container } from '../container';
 import { configuration } from '../system/configuration';
-import { Package } from 'custom-elements-manifest';
+import { Logger } from '../system/logger';
 
 export interface CustomElementsManifestReader extends Disposable {
   getAllComponents(): Promise<Component[]>;
@@ -26,7 +27,7 @@ export class ManifestsProvider implements CustomElementsManifestReader {
 
   constructor(private readonly _container: Container) {
     this.disposables.push(
-      this._container.locator.onDidChange(e => {
+      this._container.locator.onDidChange(_e => {
         if (this.etagIsStale()) {
           this.clearManifests();
           this._cachedEtag = undefined;
@@ -182,7 +183,10 @@ export class ManifestReader implements CustomElementsManifestReader {
   private _fileWatcher: FileSystemWatcher | undefined = undefined;
   private _onDidChange = new EventEmitter<void>();
 
-  constructor(private readonly container: Container, private readonly _uri: Uri) {
+  constructor(
+    private readonly container: Container,
+    private readonly _uri: Uri,
+  ) {
     this._setupFileWatcher();
   }
 

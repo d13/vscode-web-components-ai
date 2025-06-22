@@ -1,5 +1,5 @@
 import { TreeItem, TreeItemCollapsibleState, ThemeIcon } from 'vscode';
-import { ManifestItemNode } from './manifestItemNode';
+import type { ManifestItemNode } from './manifestItemNode';
 
 /**
  * Represents a group header in the tree view (e.g., "Local Manifests", "Dependencies")

@@ -14,6 +14,12 @@ This is a VS Code extension that provides web component information to AI assist
 - `pnpm run watch` - Watch mode for development
 - `pnpm run clean` - Clean build artifacts
 
+### Code Quality
+- `pnpm run lint` - Run ESLint on TypeScript files
+- `pnpm run lint:fix` - Run ESLint with auto-fix
+- `pnpm run format` - Format code with Prettier
+- `pnpm run format:check` - Check code formatting
+
 ### Packaging & Publishing
 - `pnpm run package` - Create VSIX package
 - `pnpm run package-pre` - Create pre-release VSIX package

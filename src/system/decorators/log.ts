@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { hrtime } from '@env/hrtime';
 import { getParameters } from '../function';
 import { customLoggableNameFns, getLoggableName, Logger } from '../logger';

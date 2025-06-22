@@ -1,5 +1,6 @@
-import { TreeItem, TreeItemCollapsibleState, Uri, ThemeIcon, ThemeColor, workspace } from 'vscode';
-import { ManifestSource } from '../../cem/locator';
+import type { Uri } from 'vscode';
+import { TreeItem, TreeItemCollapsibleState, ThemeIcon, ThemeColor, workspace } from 'vscode';
+import type { ManifestSource } from '../../cem/locator';
 
 /**
  * Represents a manifest item in the tree view

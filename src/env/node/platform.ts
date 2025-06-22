@@ -13,17 +13,17 @@ type OperatingSystems = 'windows' | 'macOS' | 'linux' | 'unknown';
 export type Platform = OperatingSystems | 'web' | `web-${OperatingSystems}` | 'unknown';
 
 export function getPlatform(): Platform {
-	if (isWindows) return 'windows';
-	if (isMac) return 'macOS';
-	if (isLinux) return 'linux';
-	return isWeb ? 'web' : 'unknown';
+  if (isWindows) return 'windows';
+  if (isMac) return 'macOS';
+  if (isLinux) return 'linux';
+  return isWeb ? 'web' : 'unknown';
 }
 
 export function getTempFile(filename: string): string {
-	return join(tmpdir(), filename);
+  return join(tmpdir(), filename);
 }
 
 export function getAltKeySymbol(): string {
-	if (isMac) return '⌥';
-	return 'Alt';
+  if (isMac) return '⌥';
+  return 'Alt';
 }

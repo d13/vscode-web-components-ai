@@ -1,4 +1,5 @@
-import { QuickPickItem, QuickPickItemKind } from 'vscode';
+import type { QuickPickItem } from 'vscode';
+import { QuickPickItemKind } from 'vscode';
 
 export interface QuickPickSeparator extends QuickPickItem {
   kind: QuickPickItemKind.Separator;

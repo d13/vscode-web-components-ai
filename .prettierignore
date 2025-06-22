@@ -1,5 +1,8 @@
 dist
+images
 node_modules
 out
 pnpm-lock.yaml
 LICENSE
+ThirdPartyNotices.txt
+CLAUDE.md

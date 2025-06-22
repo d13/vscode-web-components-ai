@@ -1,5 +1,6 @@
-import { TreeDataProvider, TreeItem, EventEmitter, Event, Disposable, ProviderResult, window } from 'vscode';
-import { Container } from '../container';
+import type { TreeDataProvider, TreeItem, Event, Disposable, ProviderResult } from 'vscode';
+import { EventEmitter, window } from 'vscode';
+import type { Container } from '../container';
 
 /**
  * Base class for tree data providers that simplifies common tree view functionality
