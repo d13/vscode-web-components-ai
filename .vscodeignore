@@ -26,6 +26,7 @@ tests/**
 .prettierignore
 .prettierrc
 .vscode-test.mjs
+CLAUDE.md
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 eslint.config.mjs
