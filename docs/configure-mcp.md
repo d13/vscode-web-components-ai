@@ -165,6 +165,25 @@ You can add an MCP server to Cascade by adding the following configuration to yo
 }
 ```
 
+### Void
+
+Copy the MCP server configuration from the VS Code notification and paste it into your `.void-editor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "mcp-wcai-http": {
+      "type": "http",
+      "url": "http://<host>:<port>/mcp"
+    },
+    "mcp-wcai-sse": {
+      "type": "sse",
+      "url": "http://<host>:<port>/sse"
+    }
+  }
+}
+```
+
 ### Cline
 
 - Click the _MCP Servers_ icon in the top navigation bar of the Cline extension.
