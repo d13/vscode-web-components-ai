@@ -207,4 +207,18 @@ Copy the MCP server configuration from the VS Code notification and paste it int
 
 ### Augment
 
-> Coming soon once STDIO transport is added!
+> Product release support coming soon once STDIO transport is added!
+
+In the 0.491.0 Pre-Release.
+
+To use HTTP streaming:
+
+- Click "Add HTTP MCP"
+- Name, add `mcp-wcai-http`
+- URL add `http://<host>:<port>/mcp`
+
+To use SSE:
+
+- Click "Add SSE MCP"
+- Name, add `mcp-wcai-sse`
+- URL add `http://<host>:<port>/sse`
