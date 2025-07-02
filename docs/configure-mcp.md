@@ -209,16 +209,35 @@ Copy the MCP server configuration from the VS Code notification and paste it int
 
 > Product release support coming soon once STDIO transport is added!
 
-In the 0.491.0 Pre-Release.
+#### HTTP & SSE Support in `>0.491.0` Pre-Release.
 
-To use HTTP streaming:
+Using the _Augment Settings_ view:
+
+HTTP streaming:
 
 - Click "Add HTTP MCP"
 - Name, add `mcp-wcai-http`
 - URL add `http://<host>:<port>/mcp`
 
-To use SSE:
+SSE:
 
 - Click "Add SSE MCP"
 - Name, add `mcp-wcai-sse`
 - URL add `http://<host>:<port>/sse`
+
+Using `settings.json`:
+
+```json
+"augment.advanced": {
+  "mcpServers": {
+    "mcp-wcai-http": {
+      "type": "http",
+      "url": "http://<host>:<port>/mcp"
+    },
+    "mcp-wcai-sse": {
+      "type": "sse",
+      "url": "http://<host>:<port>/sse"
+    }
+  }
+}
+```
