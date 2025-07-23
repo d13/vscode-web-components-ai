@@ -46,6 +46,19 @@ Nearly all IDEs and AI assistants use the following format:
 
 ## Integrating with AI Assistants
 
+- [VS Code (including Copilot)](#vs-code-including-copilot)
+- [Cursor](#cursor)
+- [Claude Desktop](#claude-desktop)
+- [Claude Code](#claude-code)
+- [Trae](#trae)
+- [Windsurf](#windsurf)
+- [Void](#void)
+- [Cline](#cline)
+- [Augment](#augment)
+- [AMP](#amp)
+- [Kiro](#kiro)
+
+
 ### VS Code (including Copilot)
 
 Using the copied configuration, manually add the MCP server into your `.vscode/mcp.json`:
@@ -229,6 +242,45 @@ Using `settings.json`:
 
 ```json
 "augment.advanced": {
+  "mcpServers": {
+    "mcp-wcai-http": {
+      "type": "http",
+      "url": "http://<host>:<port>/mcp"
+    },
+    "mcp-wcai-sse": {
+      "type": "sse",
+      "url": "http://<host>:<port>/sse"
+    }
+  }
+}
+```
+
+### AMP
+
+Using `settings.json`:
+
+```json
+"amp.mcpServers": {
+  "mcp-wcai-http": {
+    "type": "http",
+    "url": "http://<host>:<port>/mcp"
+  },
+  "mcp-wcai-sse": {
+    "type": "sse",
+    "url": "http://<host>:<port>/sse"
+  }
+}
+```
+
+### Kiro
+
+Copy the MCP server configuration from the VS Code notification and paste it into:
+
+- Workspace-level `.void-editor/mcp.json`
+- User-level `~/.kiro/settings/mcp.json`
+
+```json
+{
   "mcpServers": {
     "mcp-wcai-http": {
       "type": "http",
