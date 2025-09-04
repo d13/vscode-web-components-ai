@@ -276,7 +276,7 @@ Using `settings.json`:
 
 Copy the MCP server configuration from the VS Code notification and paste it into:
 
-- Workspace-level `.void-editor/mcp.json`
+- Workspace-level `.kiro/settings/mcp.json`
 - User-level `~/.kiro/settings/mcp.json`
 
 ```json
