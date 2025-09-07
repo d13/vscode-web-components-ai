@@ -3,11 +3,11 @@ Web Component AI Tools
 THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
 This project incorporates components from the projects listed below.
 
-1. @modelcontextprotocol/sdk version 1.12.3 (https://github.com/modelcontextprotocol/typescript-sdk)
-2. @wc-toolkit/cem-utilities version 1.3.0 (https://github.com/wc-toolkit/cem-utilities)
+1. @modelcontextprotocol/sdk version 1.17.5 (https://github.com/modelcontextprotocol/typescript-sdk)
+2. @wc-toolkit/cem-utilities version 1.4.1 (https://github.com/wc-toolkit/cem-utilities)
 3. custom-elements-manifest version 2.1.0 (https://github.com/webcomponents/custom-elements-manifest)
 4. microsoft/vscode (https://github.com/microsoft/vscode)
-5. zod version 3.25.32 (https://github.com/colinhacks/zod)
+5. zod version 3.25.76 (https://github.com/colinhacks/zod)
 
 %% @modelcontextprotocol/sdk NOTICES AND INFORMATION BEGIN HERE
 =========================================
