@@ -1,5 +1,5 @@
 import type { WorkspaceFoldersChangeEvent, Disposable, Event, CancellationToken, WorkspaceFolder } from 'vscode';
-import { Uri, EventEmitter, workspace } from 'vscode';
+import { Uri, EventEmitter, workspace, window } from 'vscode';
 import type { Container } from '../container';
 import { Logger } from '../system/logger';
 import { areEqual } from '../system/set';
@@ -211,6 +211,9 @@ export class ManifestLocationProvider implements Disposable {
       // Handle errors gracefully, such as file not found or JSON parse errors
       // If error is from a dependency, we may want to warn the user their dependencies may not be installed
       Logger.error(error, 'ManifestLocationProvider.findManifestsFromPackage');
+      window.showWarningMessage(
+        `Unable to load package at ${packageUri.fsPath}. Please ensure all dependencies are installed.`,
+      );
     }
     return manifests;
   }
