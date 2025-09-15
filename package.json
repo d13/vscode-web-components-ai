@@ -1,6 +1,6 @@
 {
   "name": "vscode-web-components-ai",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "displayName": "Web Component AI Tools",
   "description": "Supercharge your AI coding assistants with web component information from your workspace and dependencies. Generate accurate component code using your actual custom elements, properties, and APIs.",
   "publisher": "d13",
