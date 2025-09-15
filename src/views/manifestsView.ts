@@ -53,42 +53,41 @@ export class ManifestsView extends ViewBase<ManifestTreeElement> {
   protected async loadData(): Promise<ManifestTreeElement[]> {
     const result: ManifestTreeElement[] = [];
 
-    // Add MCP server status node at the top
-    const serverInfo = this.container.mcp.getServerInfo();
-    result.push(new McpServerNode(serverInfo));
-
     const manifests = await this.container.locator.getManifests();
     const excludeConfig = configuration.get('manifests.exclude');
     const allSources = this.container.locator.getAllManifestSources();
 
-    if (manifests.length === 0) {
-      return result;
+    if (manifests.length > 0) {
+      // Create manifest tree items
+      const manifestItems: ManifestItemNode[] = manifests.map(uri => {
+        const isExcluded = excludeConfig.includes(uri.toString());
+        const sources = allSources.get(uri.toString()) || [];
+        return new ManifestItemNode(uri, sources, isExcluded);
+      });
+
+      // Group manifests by type
+      const localManifests = manifestItems.filter(item => item.sources.some(source => source.isLocal));
+
+      const dependencyManifests = manifestItems.filter(item => item.sources.some(source => !source.isLocal));
+
+      const groups: ManifestGroupedItemNode[] = [];
+
+      if (localManifests.length > 0) {
+        groups.push(new ManifestGroupedItemNode('Local Manifests', localManifests));
+      }
+
+      if (dependencyManifests.length > 0) {
+        groups.push(new ManifestGroupedItemNode('Dependency Manifests', dependencyManifests));
+      }
+
+      this._groupedData = groups;
+      result.push(...groups);
     }
 
-    // Create manifest tree items
-    const manifestItems: ManifestItemNode[] = manifests.map(uri => {
-      const isExcluded = excludeConfig.includes(uri.toString());
-      const sources = allSources.get(uri.toString()) || [];
-      return new ManifestItemNode(uri, sources, isExcluded);
-    });
+    // Add MCP server status node at the top
+    const serverInfo = this.container.mcp.getServerInfo();
+    result.unshift(new McpServerNode(serverInfo));
 
-    // Group manifests by type
-    const localManifests = manifestItems.filter(item => item.sources.some(source => source.isLocal));
-
-    const dependencyManifests = manifestItems.filter(item => item.sources.some(source => !source.isLocal));
-
-    const groups: ManifestGroupedItemNode[] = [];
-
-    if (localManifests.length > 0) {
-      groups.push(new ManifestGroupedItemNode('Local Manifests', localManifests));
-    }
-
-    if (dependencyManifests.length > 0) {
-      groups.push(new ManifestGroupedItemNode('Dependency Manifests', dependencyManifests));
-    }
-
-    this._groupedData = groups;
-    result.push(...groups);
     return result;
   }
 
