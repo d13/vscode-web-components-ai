@@ -1,4 +1,4 @@
-import type { TreeItem, ProviderResult, Uri } from 'vscode';
+import type { TreeItem, ProviderResult, Uri, Disposable } from 'vscode';
 import type { Container } from '../container';
 import { executeCommand } from '../system/command';
 import { configuration } from '../system/configuration';
@@ -6,44 +6,63 @@ import { ViewBase } from './base';
 import { LoadingNode } from './nodes/loadingNode';
 import { ManifestGroupedItemNode } from './nodes/manifestGroupedItemNode';
 import { ManifestItemNode } from './nodes/manifestItemNode';
+import { McpServerNode } from './nodes/mcpServerNode';
 
-type ManifestTreeElement = ManifestItemNode | ManifestGroupedItemNode | LoadingNode;
+type ManifestTreeElement = ManifestItemNode | ManifestGroupedItemNode | LoadingNode | McpServerNode;
 
 /**
  * Tree data provider for Custom Elements Manifests
  */
 export class ManifestsView extends ViewBase<ManifestTreeElement> {
   private _groupedData: ManifestGroupedItemNode[] = [];
+  private _localDisposables: Disposable[] = [];
 
   constructor(container: Container) {
     super(container);
 
     // Listen for changes in the manifest location provider
-    this.container.locator.onDidChange(() => {
-      this.refresh();
-    });
-
-    // Listen for configuration changes
-    configuration.onDidChangeAny(e => {
-      if (e.affectsConfiguration('wcai.manifests.exclude')) {
+    this._localDisposables.push(
+      this.container.locator.onDidChange(() => {
         this.refresh();
-      }
-    });
+      }),
+
+      // Listen for HTTP server state changes
+      this.container.mcp.onDidChangeHttpServerState(() => {
+        this.refresh();
+      }),
+
+      // Listen for configuration changes
+      configuration.onDidChangeAny(e => {
+        if (
+          e.affectsConfiguration('wcai.manifests.exclude') ||
+          e.affectsConfiguration('wcai.mcp.port') ||
+          e.affectsConfiguration('wcai.mcp.host')
+        ) {
+          this.refresh();
+        }
+      }),
+    );
 
     // Initial load
-    this.refresh();
+    queueMicrotask(() => this.refresh());
   }
 
   /**
    * Loads manifest data from the location provider
    */
   protected async loadData(): Promise<ManifestTreeElement[]> {
+    const result: ManifestTreeElement[] = [];
+
+    // Add MCP server status node at the top
+    const serverInfo = this.container.mcp.getServerInfo();
+    result.push(new McpServerNode(serverInfo));
+
     const manifests = await this.container.locator.getManifests();
     const excludeConfig = configuration.get('manifests.exclude');
     const allSources = this.container.locator.getAllManifestSources();
 
     if (manifests.length === 0) {
-      return [];
+      return result;
     }
 
     // Create manifest tree items
@@ -69,7 +88,8 @@ export class ManifestsView extends ViewBase<ManifestTreeElement> {
     }
 
     this._groupedData = groups;
-    return groups;
+    result.push(...groups);
+    return result;
   }
 
   /**
@@ -88,8 +108,8 @@ export class ManifestsView extends ViewBase<ManifestTreeElement> {
       if (this.isRefreshing) {
         return [new LoadingNode()];
       }
-      // Return root level items (groups)
-      return this._groupedData;
+      // Return root level items (MCP server node + groups)
+      return this.data || [];
     }
 
     if (element instanceof ManifestGroupedItemNode) {
@@ -97,7 +117,7 @@ export class ManifestsView extends ViewBase<ManifestTreeElement> {
       return element.children;
     }
 
-    // Manifest items and loading nodes have no children
+    // Manifest items, MCP server nodes, and loading nodes have no children
     return [];
   }
 
@@ -131,5 +151,13 @@ export class ManifestsView extends ViewBase<ManifestTreeElement> {
       items.push(...group.children);
     }
     return items;
+  }
+
+  /**
+   * Dispose of local resources
+   */
+  override dispose(): void {
+    this._localDisposables.forEach(d => d.dispose());
+    super.dispose();
   }
 }

@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { Disposable } from 'vscode';
+import type { Disposable, Event } from 'vscode';
+import { EventEmitter } from 'vscode';
 import { z } from 'zod';
 import { getComponentDetails } from '../cem/reader';
 import type { Container } from '../container';
@@ -15,11 +16,14 @@ export const MANIFEST_SCHEME = 'manifest' as const;
 export class McpProvider implements Disposable {
   private _disposables: Disposable[] = [];
   private httpTransport: HttpTransportInfo | undefined;
+  private _onDidChangeHttpServerState = new EventEmitter<void>();
+  get onDidChangeHttpServerState(): Event<void> {
+    return this._onDidChangeHttpServerState.event;
+  }
 
   constructor(private readonly _container: Container) {
-    this.start();
-
     this._disposables.push(
+      this._onDidChangeHttpServerState,
       configuration.onDidChange(async e => {
         if (e.affectsConfiguration('mcp.port') || e.affectsConfiguration('mcp.host')) {
           if (this.httpTransport) {
@@ -37,6 +41,8 @@ export class McpProvider implements Disposable {
         }
       }),
     );
+
+    void this.start();
   }
 
   getServerInfo(): HttpTransportInfo | undefined {
@@ -73,6 +79,7 @@ export class McpProvider implements Disposable {
       }
 
       void executeCommand('wcai.mcp.showInformation');
+      this._onDidChangeHttpServerState.fire();
     } catch (error) {
       Logger.error('Failed to start MCP server', error);
     }
@@ -87,11 +94,13 @@ export class McpProvider implements Disposable {
       try {
         this.httpTransport.httpServer.close(() => {
           this.httpTransport = undefined;
+          this._onDidChangeHttpServerState.fire();
           resolve();
         });
       } catch (error) {
         Logger.error('Error while stopping MCP server', error);
         this.httpTransport = undefined;
+        this._onDidChangeHttpServerState.fire();
         resolve();
       }
     });

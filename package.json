@@ -154,6 +154,11 @@
         "command": "wcai.views.cemList.exclude",
         "title": "Exclude Manifest",
         "icon": "$(eye-closed)"
+      },
+      {
+        "command": "wcai.views.cemList.copyMcpConfig",
+        "title": "Copy Server Config",
+        "icon": "$(copy)"
       }
     ],
     "viewsContainers": {
@@ -193,6 +198,11 @@
         {
           "command": "wcai.views.cemList.exclude",
           "when": "view == wcai.views.cemList && viewItem == manifestIncluded",
+          "group": "inline"
+        },
+        {
+          "command": "wcai.views.cemList.copyMcpConfig",
+          "when": "view == wcai.views.cemList && viewItem == mcpServerRunning",
           "group": "inline"
         }
       ]
