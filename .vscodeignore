@@ -1,3 +1,4 @@
+.claude/**
 .devcontainer/**
 .github/**
 .vscode/**
@@ -26,7 +27,7 @@ tests/**
 .prettierignore
 .prettierrc
 .vscode-test.mjs
-CLAUDE.md
+AGENTS.md
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 eslint.config.mjs

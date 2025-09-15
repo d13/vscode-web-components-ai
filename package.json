@@ -30,7 +30,7 @@
     "node": "^20.18.3",
     "vscode": "^1.99.0"
   },
-  "preview": true,
+  "preview": false,
   "capabilities": {
     "virtualWorkspaces": false
   },
