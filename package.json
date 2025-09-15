@@ -152,6 +152,21 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "wcai.views.cemList.helpMcpConfig",
+        "title": "MCP Integration Help",
+        "icon": "$(question)"
+      },
+      {
+        "command": "wcai.views.cemList.issues",
+        "title": "Open Issues",
+        "icon": "$(feedback)"
+      },
+      {
+        "command": "wcai.views.cemList.discussions",
+        "title": "Open Discussions",
+        "icon": "$(comment-discussion)"
+      },
+      {
         "command": "wcai.views.cemList.include",
         "title": "Include Manifest",
         "icon": "$(eye)"
@@ -193,6 +208,26 @@
           "command": "wcai.views.cemList.refresh",
           "when": "view == wcai.views.cemList",
           "group": "navigation"
+        },
+        {
+          "command": "wcai.mcp.showInformation",
+          "when": "view == wcai.views.cemList",
+          "group": "1_wcai@01"
+        },
+        {
+          "command": "wcai.views.cemList.helpMcpConfig",
+          "when": "view == wcai.views.cemList",
+          "group": "1_wcai@02"
+        },
+        {
+          "command": "wcai.views.cemList.issues",
+          "when": "view == wcai.views.cemList",
+          "group": "2_wcai@01"
+        },
+        {
+          "command": "wcai.views.cemList.discussions",
+          "when": "view == wcai.views.cemList",
+          "group": "2_wcai@02"
         }
       ],
       "view/item/context": [

@@ -62,7 +62,7 @@ export class Container {
     this._disposables.push(
       window.createTreeView('wcai.views.cemList', {
         treeDataProvider: this._manifestTreeProvider,
-        showCollapseAll: true,
+        showCollapseAll: false,
       }),
     );
 

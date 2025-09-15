@@ -58,7 +58,6 @@ Nearly all IDEs and AI assistants use the following format:
 - [AMP](#amp)
 - [Kiro](#kiro)
 
-
 ### VS Code (including Copilot)
 
 Using the copied configuration, manually add the MCP server into your `.vscode/mcp.json`:
@@ -80,11 +79,9 @@ Using the copied configuration, manually add the MCP server into your `.vscode/m
 
 > NOTE: VS Code's format is slightly different from the standard MCP format, so ensure you use the correct keys.
 
-#### Version >=1.101.0 and later (coming soon)
+#### Version >=1.101.0 and later
 
-The extension will automatically register the MCP server with VS Code, so no additional configuration is required.
-
-<!-- #### Version <1.101.0 -->
+The extension will automatically register the MCP server with VS Code, so no additional configuration is required. Run `MCP: List Servers` in the command palette to see the server listed.
 
 ### Cursor
 

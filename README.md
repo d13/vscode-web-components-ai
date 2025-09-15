@@ -46,6 +46,8 @@ Install this extension by clicking `Install` on the banner above, or from the Ex
 
 See the **[Integrating with the MCP Server](https://github.com/d13/vscode-web-components-ai/blob/main/docs/configure-mcp.md)** guide on how to integrate with your preferred AI assistants including Copilot, Cursor, Windsurf, Claude Code, and many more.
 
+VS Code `>=1.101.0` registers the MCP server automatically with AI chat, run `MCP: List Servers` in the command palette to see the server listed.
+
 > Have questions or concerns? Let's talk directly through the [GitHub Discussions page](https://github.com/d13/vscode-web-components-ai/discussions). Having a positive experience? Feel free to [write a review](https://marketplace.visualstudio.com/items?itemName=d13.vscode-web-components-ai&ssr=false#review-details).
 
 ## 🛠️ Available Tools & Resources
