@@ -3,6 +3,7 @@ import { ExtensionMode, window } from 'vscode';
 import { ManifestLocationProvider } from './cem/locator';
 import type { CustomElementsManifestReader } from './cem/reader';
 import { ManifestsProvider } from './cem/reader';
+import { getDefinitionProviders } from './mcp/definition-provider.utils';
 import { McpProvider } from './mcp/provider';
 import { configuration } from './system/configuration';
 import { memoize } from './system/decorators/memoize';
@@ -36,36 +37,45 @@ export class Container {
     return Container.#instance ?? Container.#proxy;
   }
 
+  private _disposables!: Disposable[];
+
   private constructor(context: ExtensionContext, prerelease: boolean, version: string) {
     this._context = context;
     this._prerelease = prerelease;
     this._version = version;
 
-    const disposables: Disposable[] = [
+    this._disposables = [
       configuration,
       (this._storage = new Storage(context)),
       configuration.onDidChangeAny(this.onAnyConfigurationChanged.bind(this)),
     ];
 
-    disposables.push((this._locator = new ManifestLocationProvider(this)));
+    this._disposables.push((this._locator = new ManifestLocationProvider(this)));
     this._cem = new ManifestsProvider(this);
-    disposables.push((this._mcp = new McpProvider(this)));
+    this._disposables.push((this._mcp = new McpProvider(this)));
 
     // Initialize tree view provider
     this._manifestTreeProvider = new ManifestsView(this);
-    disposables.push(this._manifestTreeProvider);
+    this._disposables.push(this._manifestTreeProvider);
 
     // Register the tree view
-    disposables.push(
+    this._disposables.push(
       window.createTreeView('wcai.views.cemList', {
         treeDataProvider: this._manifestTreeProvider,
         showCollapseAll: true,
       }),
     );
 
+    queueMicrotask(async () => {
+      const definitionProviders = await getDefinitionProviders(this);
+      if (definitionProviders != null) {
+        this._disposables.push(...definitionProviders);
+      }
+    });
+
     context.subscriptions.push({
-      dispose: function () {
-        disposables.reverse().forEach(d => void d.dispose());
+      dispose: () => {
+        this._disposables?.reverse().forEach(d => void d.dispose());
       },
     });
   }

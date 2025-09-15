@@ -2,6 +2,7 @@ import { window, env } from 'vscode';
 import type { Container } from '../container';
 import type { HttpTransportInfo } from '../mcp/utils/transport';
 import { command } from '../system/decorators/command';
+import { supportsMcpDefinitionProvider } from '../system/mcp';
 import { CommandBase } from './base';
 
 @command()
@@ -17,7 +18,10 @@ export class McpInformationCommand extends CommandBase {
       return;
     }
 
-    const message = `MCP server (HTTP & SSE) listening at: ${serverInfo.url}`;
+    let message = `Web Component AI Tools MCP server (HTTP & SSE) listening at: ${serverInfo.url}`;
+    if (supportsMcpDefinitionProvider()) {
+      message += '. This MCP is automatically registered with your AI chat.';
+    }
 
     const copyConfig = 'Copy Config JSON';
 

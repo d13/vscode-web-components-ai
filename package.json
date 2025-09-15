@@ -39,6 +39,12 @@
     "workspaceContains:**/package.json"
   ],
   "contributes": {
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "wcai.McpDefinitionProvider",
+        "label": "Web Component AI Tools"
+      }
+    ],
     "configuration": [
       {
         "id": "general",
