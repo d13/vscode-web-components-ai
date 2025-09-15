@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.0.4] - 2025-09-15
+
+### Added
+
+- Added automatic registration of the MCP server for VS Code 1.101.0 and later ([#8](https://github.com/d13/vscode-web-components-ai/issues/8))
+- Display MCP server information in the Manifests view with an action to copy the server configuration.
+- Added help and informational links to the _Web Component AI Tools_ sidebar.
+
+### Changed
+
+- Improved error handling when locating manifests in dependencies.
+- Updated MCP server SDK
+
 ## [0.0.3] - 2025-06-18
 
 ### Added
@@ -42,7 +55,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Initial development of the project, super basic functionality.
 
-[unreleased]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.3...HEAD
+[unreleased]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.4...HEAD
+[0.0.4]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/d13/vscode-web-components-ai/tree/v0.0.1
