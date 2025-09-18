@@ -6,13 +6,14 @@ import { Container } from './container';
 import { registerDeferredCommands } from './system/command';
 import { configuration, Configuration } from './system/configuration';
 import { Logger } from './system/logger';
-import { satisfies } from './system/version';
+import { fromString } from './system/version';
 import './commands';
 
 export function activate(context: ExtensionContext) {
   const extensionName: string = context.extension.packageJSON.displayName;
   const extensionVersion: string = context.extension.packageJSON.version;
-  const prerelease = satisfies(extensionVersion, '> 2025.0.0');
+  const currentVersion = fromString(extensionVersion);
+  const prerelease = currentVersion.minor % 2 === 1;
 
   Logger.configure(
     {
