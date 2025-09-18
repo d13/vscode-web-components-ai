@@ -6,7 +6,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-## [0.0.4] - 2025-09-15
+## [1.2.0] - 2025-09-18
+
+### Added
+
+- Added _Install MCP Server_ command for easy install where supported or to provide guidance for manually configuring the MCP server.
+
+### Changed
+
+- Improved _MCP Server Information_ messaging and added links for help and installation.
+- Ensure _MCP Server Information_ only displays automatically on the first start-up.
+
+## [1.0.0] - 2025-09-15
 
 ### Added
 
@@ -55,8 +66,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Initial development of the project, super basic functionality.
 
-[unreleased]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.4...HEAD
-[0.0.4]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.3...v0.0.4
+[unreleased]: https://github.com/d13/vscode-web-components-ai/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/d13/vscode-web-components-ai/compare/v1.0.0...v1.2.0
+[1.0.0]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.3...v1.0.0
 [0.0.3]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/d13/vscode-web-components-ai/tree/v0.0.1
