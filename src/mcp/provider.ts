@@ -37,12 +37,17 @@ export class McpProvider implements Disposable {
             await this.stop();
           }
 
-          void this.start();
+          void this.start(true);
         }
       }),
     );
 
-    void this.start();
+    const firstMcpStart = this._container.storage.get('firstMcpStartRan') ?? false;
+    void this.start(firstMcpStart).then(() => {
+      if (!firstMcpStart) {
+        void this._container.storage.store('firstMcpStartRan', true);
+      }
+    });
   }
 
   getServerInfo(): HttpTransportInfo | undefined {
@@ -53,9 +58,9 @@ export class McpProvider implements Disposable {
     };
   }
 
-  async start(): Promise<void> {
+  async start(silent = false): Promise<boolean> {
     if (this.httpTransport?.httpServer) {
-      return;
+      return true;
     }
 
     Logger.log('Starting MCP server');
@@ -78,11 +83,18 @@ export class McpProvider implements Disposable {
         }
       }
 
-      void executeCommand('wcai.mcp.showInformation');
+      if (!silent) {
+        void executeCommand('wcai.mcp.showInformation');
+      }
+
       this._onDidChangeHttpServerState.fire();
+
+      return true;
     } catch (error) {
       Logger.error('Failed to start MCP server', error);
     }
+
+    return false;
   }
 
   stop(): Promise<void> {

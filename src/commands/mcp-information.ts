@@ -1,8 +1,10 @@
 import { window, env } from 'vscode';
 import type { Container } from '../container';
 import type { HttpTransportInfo } from '../mcp/utils/transport';
+import { executeCommand } from '../system/command';
 import { command } from '../system/decorators/command';
-import { supportsMcpDefinitionProvider } from '../system/mcp';
+import { supportsMcpDefinitionProvider, supportsMcpUrlHandler } from '../system/mcp';
+import { getHostAppName } from '../system/vscode';
 import { CommandBase } from './base';
 
 @command()
@@ -20,15 +22,35 @@ export class McpInformationCommand extends CommandBase {
 
     let message = `Web Component AI Tools MCP server (HTTP & SSE) listening at: ${serverInfo.url}`;
     if (supportsMcpDefinitionProvider()) {
-      message += '. This MCP is automatically registered with your AI chat.';
+      message += '. This MCP is automatically installed and active with your AI chat.';
     }
 
-    const copyConfig = 'Copy Config JSON';
+    const copyConfig = { title: 'Copy Config JSON' };
+    const installConfig = { title: 'Install MCP' };
+    const openDocs = { title: 'MCP Integration Help' };
+    const cancel = { title: 'Ok', isCloseAffordance: true };
+    let actions = [copyConfig, openDocs, cancel];
+    if (supportsMcpDefinitionProvider()) {
+      actions = [cancel];
+    } else if (supportsMcpUrlHandler(await getHostAppName())) {
+      actions = [installConfig, cancel];
+    }
 
-    const result = await window.showInformationMessage(message, copyConfig);
-    if (result !== copyConfig) return;
+    const result = await window.showInformationMessage(message, ...actions);
 
-    void copyMcpConfig(serverInfo);
+    if (result === copyConfig) {
+      void copyMcpConfig(serverInfo);
+      return;
+    }
+
+    if (result === installConfig) {
+      void executeCommand('wcai.mcp.install');
+      return;
+    }
+
+    if (result === openDocs) {
+      void executeCommand('wcai.views.cemList.helpMcpConfig');
+    }
   }
 }
 

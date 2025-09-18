@@ -5,7 +5,9 @@ export type SecretKeys = string;
 
 export type DeprecatedGlobalStorage = {};
 
-export type GlobalStorage = {};
+export type GlobalStorage = {
+  firstMcpStartRan: boolean;
+};
 
 export type DeprecatedWorkspaceStorage = {};
 

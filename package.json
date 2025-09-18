@@ -137,14 +137,21 @@
         "category": "Web Components AI"
       },
       {
+        "command": "wcai.mcp.install",
+        "title": "Install MCP Server",
+        "category": "Web Components AI"
+      },
+      {
         "command": "wcai.mcp.start",
         "title": "Start MCP Server",
-        "category": "Web Components AI"
+        "category": "Web Components AI",
+        "icon": "$(plug)"
       },
       {
         "command": "wcai.mcp.stop",
         "title": "Stop MCP Server",
-        "category": "Web Components AI"
+        "category": "Web Components AI",
+        "icon": "$(debug-disconnect)"
       },
       {
         "command": "wcai.views.cemList.refresh",
@@ -215,19 +222,24 @@
           "group": "1_wcai@01"
         },
         {
-          "command": "wcai.views.cemList.helpMcpConfig",
-          "when": "view == wcai.views.cemList",
-          "group": "1_wcai@02"
-        },
-        {
-          "command": "wcai.views.cemList.issues",
+          "command": "wcai.mcp.install",
           "when": "view == wcai.views.cemList",
           "group": "2_wcai@01"
         },
         {
-          "command": "wcai.views.cemList.discussions",
+          "command": "wcai.views.cemList.helpMcpConfig",
           "when": "view == wcai.views.cemList",
           "group": "2_wcai@02"
+        },
+        {
+          "command": "wcai.views.cemList.issues",
+          "when": "view == wcai.views.cemList",
+          "group": "3_wcai@01"
+        },
+        {
+          "command": "wcai.views.cemList.discussions",
+          "when": "view == wcai.views.cemList",
+          "group": "3_wcai@02"
         }
       ],
       "view/item/context": [
