@@ -1,9 +1,14 @@
 import { version, lm, env } from 'vscode';
 import { openUrl } from './uris';
 import { satisfies } from './version';
-import { isHostVSCode } from './vscode';
+import { getHostAppName, isHostVSCode } from './vscode';
 
-export function supportsMcpDefinitionProvider(): boolean {
+export async function supportsMcpDefinitionProvider(hostAppName?: string): Promise<boolean> {
+  hostAppName ??= await getHostAppName();
+
+  // TODO: Kiro supports MCP definition provider, but doesn't appear in its MCP list, so ignore it for now
+  if (hostAppName === 'kiro') return false;
+
   return satisfies(version, '>= 1.101.0') && lm.registerMcpServerDefinitionProvider != null;
 }
 

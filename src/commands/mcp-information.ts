@@ -20,20 +20,21 @@ export class McpInformationCommand extends CommandBase {
       return;
     }
 
+    const doesSupportDefinitionProvider = await supportsMcpDefinitionProvider();
     let message = `Web Component AI Tools MCP server (HTTP & SSE) listening at: ${serverInfo.url}`;
-    if (supportsMcpDefinitionProvider()) {
-      message += '. This MCP is automatically installed and active with your AI chat.';
-    }
 
     const copyConfig = { title: 'Copy Config JSON' };
     const installConfig = { title: 'Install MCP' };
     const openDocs = { title: 'MCP Integration Help' };
     const cancel = { title: 'Ok', isCloseAffordance: true };
     let actions = [copyConfig, openDocs, cancel];
-    if (supportsMcpDefinitionProvider()) {
-      actions = [cancel];
+    if (doesSupportDefinitionProvider) {
+      message += '. This MCP is automatically installed and active with your AI chat.';
+      actions = [copyConfig, cancel];
     } else if (supportsMcpUrlHandler(await getHostAppName())) {
-      actions = [installConfig, cancel];
+      actions = [installConfig, copyConfig, cancel];
+    } else {
+      message += '. Copy the configuration below to manually add to your MCP settings.';
     }
 
     const result = await window.showInformationMessage(message, ...actions);

@@ -20,7 +20,7 @@ export class McpInstallCommand extends CommandBase {
       return;
     }
 
-    if (supportsMcpDefinitionProvider()) {
+    if (await supportsMcpDefinitionProvider()) {
       void window.showInformationMessage('MCP server is automatically installed and active in your AI chat.');
       return;
     }
