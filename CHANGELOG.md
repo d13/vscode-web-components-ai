@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [1.2.1] - 2025-09-21
+
+### Fixed
+
+- Prevents from registering the MCP Definition Provider in Kiro as it doesn't properly support it.
+
 ## [1.2.0] - 2025-09-18
 
 ### Added
@@ -66,7 +72,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Initial development of the project, super basic functionality.
 
-[unreleased]: https://github.com/d13/vscode-web-components-ai/compare/v1.2.0...HEAD
+[unreleased]: https://github.com/d13/vscode-web-components-ai/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/d13/vscode-web-components-ai/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/d13/vscode-web-components-ai/compare/v1.0.0...v1.2.0
 [1.0.0]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.3...v1.0.0
 [0.0.3]: https://github.com/d13/vscode-web-components-ai/compare/v0.0.2...v0.0.3
