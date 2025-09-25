@@ -85,9 +85,11 @@ Using the copied configuration, manually add the MCP server into your `.vscode/m
   }
 }
 ```
-</details>
 
 > NOTE: VS Code's format is slightly different from the standard MCP format, so ensure you use the correct keys.
+
+</details>
+
 
 
 
@@ -311,6 +313,8 @@ Using `settings.json`:
 
 ### Kiro
 
+> Kiro doesn't support http-based MCP servers, however you can use the [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) NPM package to make requests through `stdio`.
+
 Copy the MCP server configuration from the VS Code notification and paste it into:
 
 - Workspace-level `.kiro/settings/mcp.json`
@@ -323,14 +327,17 @@ Copy the MCP server configuration from the VS Code notification and paste it int
 {
   "mcpServers": {
     "mcp-wcai-http": {
-      "type": "http",
-      "url": "http://<host>:<port>/mcp"
+      "command": "npx",
+      "args": ["mcp-remote", "http://<host>:<port>/mcp", "--transport", "http"]
     },
     "mcp-wcai-sse": {
-      "type": "sse",
-      "url": "http://<host>:<port>/sse"
+      "command": "npx",
+      "args": ["mcp-remote", "http://<host>:<port>/sse", "--transport", "sse"]
     }
   }
 }
 ```
+
+> NOTE: Kiro's format is very different from the standard MCP format, so ensure you use the correct formatting.
+
 </details>
