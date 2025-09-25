@@ -27,8 +27,9 @@ The MCP Server's hostname by default is `127.0.0.1` and the port is randomly ass
 2. Copy the server configuration by running the `Web Components AI: MCP Server Information` command and clicking the "Copy Config" button.
 3. Paste the configuration into the settings for your AI assistant or tool.
 
-Nearly all IDEs and AI assistants use the following format:
-
+<details>
+<summary>🗒️ Format for almost all IDEs and AI assistants</summary>
+  
 ```json
 {
   "mcpServers": {
@@ -43,6 +44,8 @@ Nearly all IDEs and AI assistants use the following format:
   }
 }
 ```
+
+</details>
 
 ## Integrating with AI Assistants
 
