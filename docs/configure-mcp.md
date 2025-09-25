@@ -60,8 +60,17 @@ Nearly all IDEs and AI assistants use the following format:
 
 ### VS Code (including Copilot)
 
+#### Automatically installation
+
+The extension will automatically register the MCP server with VS Code, so no additional configuration is required. Run `MCP: List Servers` in the command palette to see the server listed.
+
+#### Older versions (`<1.101.0`)
+
 Using the copied configuration, manually add the MCP server into your `.vscode/mcp.json`:
 
+<details>
+<summary>🗒️ Config Example</summary>
+  
 ```json
 {
   "servers": {
@@ -76,16 +85,18 @@ Using the copied configuration, manually add the MCP server into your `.vscode/m
   }
 }
 ```
+</details>
 
 > NOTE: VS Code's format is slightly different from the standard MCP format, so ensure you use the correct keys.
 
-#### Version >=1.101.0 and later
 
-The extension will automatically register the MCP server with VS Code, so no additional configuration is required. Run `MCP: List Servers` in the command palette to see the server listed.
 
 ### Cursor
 
 Copy the MCP server configuration from the VS Code notification and paste it into your `.cursor/mcp.json`:
+
+<details>
+<summary>🗒️ Config Example</summary>
 
 ```json
 {
@@ -101,6 +112,7 @@ Copy the MCP server configuration from the VS Code notification and paste it int
   }
 }
 ```
+</details>
 
 ### Claude Desktop
 
@@ -123,6 +135,9 @@ claude mcp add --transport sse sse-server http://<host>:<port>/sse --scope proje
 
 Add a `.mcp.json` file in the the root of your project:
 
+<details>
+<summary>🗒️ Config Example</summary>
+
 ```json
 {
   "mcpServers": {
@@ -137,11 +152,15 @@ Add a `.mcp.json` file in the the root of your project:
   }
 }
 ```
+</details>
 
 ### Trae
 
 - At the top right of the side chat box, click the _Settings_ icon, and select _MCP_ from the menu. The MCP tab appears.
 - Click the _+ Add_ button and select _Add Manually_ from the menu. The Configure Manually window appears.
+
+<details>
+<summary>🗒️ Config Example</summary>
 
 ```json
 {
@@ -153,6 +172,7 @@ Add a `.mcp.json` file in the the root of your project:
   }
 }
 ```
+</details>
 
 > NOTE: Only one MCP server entry is allowed at a time.
 
@@ -160,6 +180,9 @@ Add a `.mcp.json` file in the the root of your project:
 
 You can add an MCP server to Cascade by adding the following configuration to your `~/.codeium/windsurf/mcp_config.json` file:
 
+<details>
+<summary>🗒️ Config Example</summary>
+
 ```json
 {
   "mcpServers": {
@@ -174,11 +197,15 @@ You can add an MCP server to Cascade by adding the following configuration to yo
   }
 }
 ```
+</details>
 
 ### Void
 
 Copy the MCP server configuration from the VS Code notification and paste it into your `.void-editor/mcp.json`:
 
+<details>
+<summary>🗒️ Config Example</summary>
+
 ```json
 {
   "mcpServers": {
@@ -193,6 +220,7 @@ Copy the MCP server configuration from the VS Code notification and paste it int
   }
 }
 ```
+</details>
 
 ### Cline
 
@@ -200,6 +228,9 @@ Copy the MCP server configuration from the VS Code notification and paste it int
 - Click the _Installed_ tab.
 - Click the _Configure MCP Servers_ button and enter the configuration into the `cline_mcp_settings.json` file:
 
+<details>
+<summary>🗒️ Config Example</summary>
+
 ```json
 {
   "mcpServers": {
@@ -214,6 +245,7 @@ Copy the MCP server configuration from the VS Code notification and paste it int
   }
 }
 ```
+</details>
 
 ### Augment
 
@@ -237,6 +269,9 @@ SSE:
 
 Using `settings.json`:
 
+<details>
+<summary>🗒️ Config Example</summary>
+
 ```json
 "augment.advanced": {
   "mcpServers": {
@@ -251,10 +286,14 @@ Using `settings.json`:
   }
 }
 ```
+</details>
 
 ### AMP
 
 Using `settings.json`:
+
+<details>
+<summary>🗒️ Config Example</summary>
 
 ```json
 "amp.mcpServers": {
@@ -268,6 +307,7 @@ Using `settings.json`:
   }
 }
 ```
+</details>
 
 ### Kiro
 
@@ -275,6 +315,9 @@ Copy the MCP server configuration from the VS Code notification and paste it int
 
 - Workspace-level `.kiro/settings/mcp.json`
 - User-level `~/.kiro/settings/mcp.json`
+
+<details>
+<summary>🗒️ Config Example</summary>
 
 ```json
 {
@@ -290,3 +333,4 @@ Copy the MCP server configuration from the VS Code notification and paste it int
   }
 }
 ```
+</details>
