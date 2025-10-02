@@ -1,0 +1,194 @@
+{
+  "name": "vscode-web-components-ai",
+  "version": "1.2.1",
+  "displayName": "Web Component AI Tools",
+  "description": "Supercharge your AI coding assistants with web component information from your workspace and dependencies. Generate accurate component code using your actual custom elements, properties, and APIs.",
+  "publisher": "d13",
+  "author": {
+    "name": "Keith Daulton",
+    "email": "kdaulton@d13design.com"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "homepage": "https://github.com/d13/vscode-web-components-ai",
+  "bugs": {
+    "url": "https://github.com/d13/vscode-web-components-ai/issues"
+  },
+  "repository": {
+    "url": "https://github.com/d13/vscode-web-components-ai.git",
+    "type": "git"
+  },
+  "galleryBanner": {
+    "color": "#181c21",
+    "theme": "dark"
+  },
+  "icon": "images/wcai-icon.png",
+  "engines": {
+    "node": "^20.18.3",
+    "vscode": "^1.99.0"
+  },
+  "preview": false,
+  "capabilities": {
+    "virtualWorkspaces": false
+  },
+  "activationEvents": [
+    "workspaceContains:**/custom-elements.json",
+    "workspaceContains:**/package.json"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Web Component AI Tools",
+      "properties": {
+        "wcai.outputLevel": {
+          "type": "string",
+          "default": "info",
+          "enum": [
+            "off",
+            "error",
+            "warn",
+            "info",
+            "debug"
+          ],
+          "description": "Controls the verbosity of logging output"
+        },
+        "wcai.manifests.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Array of manifest URIs to exclude from component discovery"
+        },
+        "wcai.mcp.host": {
+          "type": "string",
+          "default": "127.0.0.1",
+          "description": "Host address for the MCP server"
+        },
+        "wcai.mcp.port": {
+          "type": "number",
+          "default": 0,
+          "description": "Port for the MCP server (0 = auto-assign)"
+        },
+        "wcai.mcp.storeHostAndPortOnStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically save server host and port configuration after startup"
+        },
+        "wcai.mcp.useCliServer": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use the CLI-based MCP server instead of the built-in server"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "wcai.mcp.start",
+        "title": "Start MCP Server",
+        "category": "WCAI"
+      },
+      {
+        "command": "wcai.mcp.stop",
+        "title": "Stop MCP Server",
+        "category": "WCAI"
+      },
+      {
+        "command": "wcai.checkCli",
+        "title": "Check CLI Availability",
+        "category": "WCAI"
+      },
+      {
+        "command": "wcai.installCli",
+        "title": "Install CLI",
+        "category": "WCAI"
+      },
+      {
+        "command": "wcai.switchToCli",
+        "title": "Switch to CLI Server",
+        "category": "WCAI"
+      },
+      {
+        "command": "wcai.switchToBuiltin",
+        "title": "Switch to Built-in Server",
+        "category": "WCAI"
+      },
+      {
+        "command": "wcai.runCliSetup",
+        "title": "Run CLI Setup Wizard",
+        "category": "WCAI"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "wcai.views.cemList",
+          "name": "Web Component Manifests",
+          "when": "workspaceContains:**/custom-elements.json || workspaceContains:**/package.json"
+        }
+      ]
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "wcai.mcp.start",
+          "when": "true"
+        },
+        {
+          "command": "wcai.mcp.stop",
+          "when": "true"
+        },
+        {
+          "command": "wcai.checkCli",
+          "when": "true"
+        },
+        {
+          "command": "wcai.installCli",
+          "when": "true"
+        },
+        {
+          "command": "wcai.switchToCli",
+          "when": "true"
+        },
+        {
+          "command": "wcai.switchToBuiltin",
+          "when": "true"
+        },
+        {
+          "command": "wcai.runCliSetup",
+          "when": "true"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "webpack --mode development",
+    "bundle": "webpack --mode production",
+    "bundle:extension": "webpack --mode production --config-name extension:node",
+    "clean": "pnpx rimraf dist out .vscode-test .vscode-test-web .eslintcache* tsconfig*.tsbuildinfo",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "package": "vsce package --no-dependencies",
+    "package-pre": "pnpm run package --pre-release",
+    "pub": "vsce publish --no-dependencies",
+    "pub-pre": "vsce publish --no-dependencies --pre-release",
+    "vscode:prepublish": "pnpm run bundle",
+    "watch": "webpack --watch --mode development"
+  },
+  "dependencies": {
+    "@wcai/cli": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.99.0",
+    "@vscode/vsce": "^3.2.1",
+    "copy-webpack-plugin": "^12.0.2",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4"
+  }
+}

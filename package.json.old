@@ -1,0 +1,263 @@
+{
+  "name": "vscode-wc-ai-tools",
+  "version": "1.2.1",
+  "displayName": "Web Component AI Tools - Monorepo",
+  "description": "Monorepo for Web Component AI Tools CLI and VS Code extension",
+  "private": true,
+  "author": {
+    "name": "Keith Daulton",
+    "email": "kdaulton@d13design.com"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "homepage": "https://github.com/d13/vscode-web-components-ai",
+  "bugs": {
+    "url": "https://github.com/d13/vscode-web-components-ai/issues"
+  },
+  "repository": {
+    "url": "https://github.com/d13/vscode-web-components-ai.git",
+    "type": "git"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": "^20.18.3"
+  },
+
+      {
+        "id": "manifests",
+        "title": "Custom Elements Manifests",
+        "order": 5,
+        "properties": {
+          "wcai.manifests.exclude": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "List of manifest file URIs to exclude from processing and display.",
+            "scope": "window",
+            "order": 10
+          }
+        }
+      },
+      {
+        "id": "mcp",
+        "title": "Model Context Protocol (MCP) Server",
+        "order": 10,
+        "properties": {
+          "wcai.mcp.port": {
+            "type": "number",
+            "default": 0,
+            "description": "The HTTP port for the MCP server. The OS will assign a port if this is not set and likely different each time.",
+            "scope": "window",
+            "order": 10
+          },
+          "wcai.mcp.host": {
+            "type": "string",
+            "default": "127.0.0.1",
+            "description": "The HTTP host for the MCP server.",
+            "scope": "window",
+            "order": 20
+          },
+          "wcai.mcp.storeHostAndPortOnStart": {
+            "type": "boolean",
+            "default": true,
+            "description": "Saves the host and port of the MCP server after startup if they are not already in settings. This prevents MCP configuration files from needing to be updated after the MCP server is restarted.",
+            "scope": "window",
+            "order": 30
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "wcai.manifests.list",
+        "title": "List Custom Elements Manifests",
+        "category": "Web Components AI"
+      },
+      {
+        "command": "wcai.manifests.locate",
+        "title": "Locate Custom Elements Manifests",
+        "category": "Web Components AI"
+      },
+      {
+        "command": "wcai.mcp.showInformation",
+        "title": "MCP Server Information",
+        "category": "Web Components AI"
+      },
+      {
+        "command": "wcai.mcp.install",
+        "title": "Install MCP Server",
+        "category": "Web Components AI"
+      },
+      {
+        "command": "wcai.mcp.start",
+        "title": "Start MCP Server",
+        "category": "Web Components AI",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "wcai.mcp.stop",
+        "title": "Stop MCP Server",
+        "category": "Web Components AI",
+        "icon": "$(debug-disconnect)"
+      },
+      {
+        "command": "wcai.views.cemList.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "wcai.views.cemList.helpMcpConfig",
+        "title": "MCP Integration Help",
+        "icon": "$(question)"
+      },
+      {
+        "command": "wcai.views.cemList.issues",
+        "title": "Open Issues",
+        "icon": "$(feedback)"
+      },
+      {
+        "command": "wcai.views.cemList.discussions",
+        "title": "Open Discussions",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "wcai.views.cemList.include",
+        "title": "Include Manifest",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "wcai.views.cemList.exclude",
+        "title": "Exclude Manifest",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "wcai.views.cemList.copyMcpConfig",
+        "title": "Copy Server Config",
+        "icon": "$(copy)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "web-components-ai",
+          "title": "Web Component AI Tools",
+          "icon": "images/wcai-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "web-components-ai": [
+        {
+          "id": "wcai.views.cemList",
+          "name": "Manifests",
+          "type": "tree",
+          "contextualTitle": "WCAI",
+          "icon": "$(file-code)"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "wcai.views.cemList.refresh",
+          "when": "view == wcai.views.cemList",
+          "group": "navigation"
+        },
+        {
+          "command": "wcai.mcp.showInformation",
+          "when": "view == wcai.views.cemList",
+          "group": "1_wcai@01"
+        },
+        {
+          "command": "wcai.mcp.install",
+          "when": "view == wcai.views.cemList",
+          "group": "2_wcai@01"
+        },
+        {
+          "command": "wcai.views.cemList.helpMcpConfig",
+          "when": "view == wcai.views.cemList",
+          "group": "2_wcai@02"
+        },
+        {
+          "command": "wcai.views.cemList.issues",
+          "when": "view == wcai.views.cemList",
+          "group": "3_wcai@01"
+        },
+        {
+          "command": "wcai.views.cemList.discussions",
+          "when": "view == wcai.views.cemList",
+          "group": "3_wcai@02"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "wcai.views.cemList.include",
+          "when": "view == wcai.views.cemList && viewItem == manifestExcluded",
+          "group": "inline"
+        },
+        {
+          "command": "wcai.views.cemList.exclude",
+          "when": "view == wcai.views.cemList && viewItem == manifestIncluded",
+          "group": "inline"
+        },
+        {
+          "command": "wcai.views.cemList.copyMcpConfig",
+          "when": "view == wcai.views.cemList && viewItem == mcpServerRunning",
+          "group": "inline"
+        }
+      ]
+    }
+  },
+  "main": "./dist/extension.js",
+  "scripts": {
+    "build": "webpack --mode development",
+    "bundle": "webpack --mode production",
+    "bundle:extension": "webpack --mode production --config-name extension:node",
+    "clean": "pnpx rimraf dist out .vscode-test .vscode-test-web .eslintcache* tsconfig*.tsbuildinfo",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "generate:licenses": "node ./scripts/generateLicenses.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "package": "vsce package --no-dependencies",
+    "package-pre": "pnpm run package --pre-release",
+    "pub": "vsce publish --no-dependencies",
+    "pub-pre": "vsce publish --no-dependencies --pre-release",
+    "vscode:prepublish": "pnpm run bundle",
+    "watch": "webpack --watch --mode development"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.5",
+    "@wc-toolkit/cem-utilities": "^1.4.1",
+    "custom-elements-manifest": "^2.1.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@types/node": "^22.18.1",
+    "@types/vscode": "1.99.0",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "@vscode/vsce": "^3.6.0",
+    "copy-webpack-plugin": "^13.0.1",
+    "eslint": "^9.35.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "license-checker-rseidelsohn": "^4.4.2",
+    "prettier": "^3.6.2",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.42.0",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1"
+  },
+  "packageManager": "pnpm@10.10.0"
+}
