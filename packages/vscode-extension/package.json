@@ -2,7 +2,7 @@
   "name": "vscode-web-components-ai",
   "version": "1.2.1",
   "displayName": "Web Component AI Tools",
-  "description": "Supercharge your AI coding assistants with web component information from your workspace and dependencies. Generate accurate component code using your actual custom elements, properties, and APIs.",
+  "description": "Supercharge your AI coding assistants with web component information from your workspace and dependencies. Generate accurate component code using your actual custom elements, properties, and APIs. Powered by the WCAI CLI.",
   "publisher": "d13",
   "author": {
     "name": "Keith Daulton",
@@ -77,16 +77,6 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically save server host and port configuration after startup"
-        },
-        "wcai.mcp.useCliServer": {
-          "type": "boolean",
-          "default": true,
-          "description": "Use the CLI-based MCP server instead of the built-in server. The CLI provides better performance and additional features. Automatically falls back to built-in server if CLI is not available."
-        },
-        "wcai.mcp.showCliRecommendation": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show a one-time notification recommending the CLI-based MCP server for better performance"
         }
       }
     },

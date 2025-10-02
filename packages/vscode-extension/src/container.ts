@@ -7,6 +7,7 @@ import { getDefinitionProviders } from './mcp/definition-provider.utils';
 import { createMcpProvider } from './mcp/factory';
 import type { IMcpProvider } from './mcp/types';
 import { McpMonitoringService } from './mcp/monitoring';
+import { StubMcpProvider } from './mcp/stub-provider';
 import { configuration } from './system/configuration';
 import { memoize } from './system/decorators/memoize';
 import { Logger } from './system/logger';
@@ -133,15 +134,10 @@ export class Container {
       this._mcpMonitoring = new McpMonitoringService(this, this._mcp);
       this._disposables.push(this._mcpMonitoring);
     } catch (error) {
-      Logger.error(error, 'Failed to initialize MCP provider');
-      // Fallback to built-in provider
-      const { McpProvider } = await import('./mcp/provider');
-      this._mcp = new McpProvider(this);
+      Logger.error(error, 'Failed to initialize CLI-based MCP provider');
+      // CLI is required - create a stub provider that shows error messages
+      this._mcp = new StubMcpProvider(error);
       this._disposables.push(this._mcp);
-
-      // Initialize monitoring for fallback provider too
-      this._mcpMonitoring = new McpMonitoringService(this, this._mcp);
-      this._disposables.push(this._mcpMonitoring);
     }
   }
 
