@@ -1,0 +1,103 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Enable Corepack
+      run: corepack enable
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.18.3'
+        cache: 'pnpm'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Build
+      run: pnpm run build
+
+    - name: Test
+      run: pnpm run test:ci
+
+    - name: Package CLI
+      run: cd packages/cli && npm pack
+
+    - name: Package VS Code Extension
+      run: cd packages/vscode-extension && pnpm run package
+
+    - name: Extract version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ steps.version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+        body: |
+          ## Changes in ${{ steps.version.outputs.VERSION }}
+          
+          See [CHANGELOG.md](https://github.com/d13/vscode-web-components-ai/blob/main/CHANGELOG.md) for detailed changes.
+          
+          ## Installation
+          
+          ### CLI
+          ```bash
+          npm install -g @wcai/cli@${{ steps.version.outputs.VERSION }}
+          ```
+          
+          ### VS Code Extension
+          Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=d13.vscode-web-components-ai) or download the VSIX file from this release.
+
+    - name: Upload CLI package to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: packages/cli/wcai-cli-${{ steps.version.outputs.VERSION }}.tgz
+        asset_name: wcai-cli-${{ steps.version.outputs.VERSION }}.tgz
+        asset_content_type: application/gzip
+
+    - name: Upload VS Code Extension to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: packages/vscode-extension/vscode-web-components-ai-${{ steps.version.outputs.VERSION }}.vsix
+        asset_name: vscode-web-components-ai-${{ steps.version.outputs.VERSION }}.vsix
+        asset_content_type: application/zip
+
+    - name: Publish CLI to npm
+      if: "!contains(github.ref, 'beta') && !contains(github.ref, 'alpha')"
+      run: cd packages/cli && pnpm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Publish VS Code Extension
+      if: "!contains(github.ref, 'beta') && !contains(github.ref, 'alpha')"
+      run: cd packages/vscode-extension && pnpm run pub
+      env:
+        VSCE_PAT: ${{ secrets.VSCE_PAT }}

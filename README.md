@@ -1,11 +1,63 @@
 # Web Component AI Tools
 
+A comprehensive toolkit for integrating web component information with AI assistants via Model Context Protocol (MCP). This monorepo contains both a standalone CLI and a VS Code extension that discover custom elements manifests and expose them through MCP servers.
+
 Supercharge your AI coding assistants with web component information from your workspace and dependencies. Generate accurate component code using your actual custom elements, properties, and APIs.
+
+## 🚀 Quick Start
+
+### Option 1: Standalone CLI (Recommended)
+
+```bash
+# Install globally
+npm install -g @wcai/cli
+
+# Run setup wizard
+wcai setup
+
+# Start MCP server
+wcai start
+```
+
+### Option 2: VS Code Extension
+
+1. Install the extension from VS Code Marketplace
+2. Open a workspace with web components
+3. Start the MCP server from Command Palette: "WCAI: Start MCP Server"
+
+## 📦 Packages
+
+This monorepo contains two main packages:
+
+### [@wcai/cli](packages/cli/) - Standalone CLI
+
+A feature-complete CLI tool that provides MCP server functionality for any development environment.
+
+**Key Features:**
+
+- 🌐 Multiple transport protocols (HTTP, SSE, STDIO)
+- ⚙️ Flexible configuration system
+- 🔍 Automatic component discovery
+- 🎯 Interactive setup wizard
+- 📊 Comprehensive logging
+
+### [vscode-web-components-ai](packages/vscode-extension/) - VS Code Extension
+
+A VS Code extension that integrates web component information directly into your development workflow.
+
+**Key Features:**
+
+- 🌳 Tree view of discovered manifests
+- 🔧 Integrated MCP server management
+- 🎛️ VS Code settings integration
+- 🔄 CLI integration support
 
 ## 🚀 Benefits
 
 - **Accelerate UI development** by facilitating AI agents to build using your custom elements and web component libraries
 - **Expose documentation** of your web components and libraries through AI chat
+- **Cross-platform support** with both CLI and VS Code extension options
+- **Flexible deployment** via multiple transport protocols
 
 ## ✨ Features
 

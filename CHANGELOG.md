@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Added
+
+- **Standalone CLI Package**: New `@wcai/cli` package with complete MCP server functionality
+- **Monorepo Structure**: Restructured project with pnpm workspaces for CLI and VS Code extension
+- **Multiple Transport Protocols**: HTTP, SSE, and STDIO support for different integration scenarios
+- **Interactive Setup Wizard**: Guided configuration with project detection and MCP config generation
+- **Multi-level Configuration**: Command line args, environment variables, local/global config files with proper precedence
+- **Comprehensive CLI Commands**: Server management, configuration, manifest discovery, and component queries
+- **CLI Integration for VS Code**: Commands to check CLI availability, switch server modes, and run setup
+- **Enhanced Documentation**: Comprehensive README, CLI documentation, and contributing guidelines
+- **Unit Testing Framework**: Jest-based testing with TypeScript support and coverage reporting
+
+### Changed
+
+- **Architecture**: CLI becomes primary implementation with VS Code extension as thin wrapper
+- **Configuration System**: Enhanced with Zod validation and better error handling
+- **Error Handling**: Improved error messages and recovery throughout the application
+- **Logging**: Configurable log levels with structured output
+
+### Technical
+
+- **Node.js Adaptation**: Ported CEM system from VS Code APIs to Node.js environment
+- **Cross-Platform Support**: CLI works on Windows, macOS, and Linux
+- **Process Management**: Graceful shutdown, PID tracking, and signal handling
+- **File Watching**: Automatic manifest change detection with cache invalidation
+
 ## [1.2.1] - 2025-09-21
 
 ### Fixed
