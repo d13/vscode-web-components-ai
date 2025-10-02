@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { Command } from 'commander';
 import { createConfigCommand } from '../../commands/config';
 import * as configModule from '../../config';
@@ -16,16 +16,16 @@ describe('Config Commands', () => {
 
   beforeEach(() => {
     program = new Command();
-    
+
     // Reset mocks
     jest.clearAllMocks();
-    
+
     // Mock config functions
     mockLoadConfig = configModule.loadConfig as jest.MockedFunction<any>;
     mockSaveLocalConfig = configModule.saveLocalConfig as jest.MockedFunction<any>;
     mockSaveGlobalConfig = configModule.saveGlobalConfig as jest.MockedFunction<any>;
     mockGetConfigManager = configModule.getConfigManager as jest.MockedFunction<any>;
-    
+
     // Mock config manager
     mockConfigManager = {
       loadConfig: jest.fn(),
@@ -33,12 +33,12 @@ describe('Config Commands', () => {
       getConfig: jest.fn(),
       resetConfig: jest.fn(),
     };
-    
+
     mockGetConfigManager.mockReturnValue(mockConfigManager);
-    
+
     // Mock console methods
-    jest.spyOn(console, 'log').mockImplementation();
-    jest.spyOn(console, 'error').mockImplementation();
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -68,7 +68,7 @@ describe('Config Commands', () => {
       program.addCommand(configCommand);
 
       // Simulate running "config get"
-      await program.parseAsync(['node', 'wcai', 'config', 'get'], { from: 'user' });
+      await program.parseAsync(['config', 'get'], { from: 'user' });
 
       expect(mockLoadConfig).toHaveBeenCalledWith(process.cwd());
       expect(console.log).toHaveBeenCalledWith(JSON.stringify(mockConfig, null, 2));
@@ -96,7 +96,7 @@ describe('Config Commands', () => {
       program.addCommand(configCommand);
 
       // Simulate running "config get server.host"
-      await program.parseAsync(['node', 'wcai', 'config', 'get', 'server.host'], { from: 'user' });
+      await program.parseAsync(['config', 'get', 'server.host'], { from: 'user' });
 
       expect(console.log).toHaveBeenCalledWith('127.0.0.1');
     });
@@ -123,7 +123,7 @@ describe('Config Commands', () => {
       program.addCommand(configCommand);
 
       // Simulate running "config get nonexistent.key"
-      await program.parseAsync(['node', 'wcai', 'config', 'get', 'nonexistent.key'], { from: 'user' });
+      await program.parseAsync(['config', 'get', 'nonexistent.key'], { from: 'user' });
 
       expect(console.log).toHaveBeenCalledWith('undefined');
     });
@@ -141,7 +141,7 @@ describe('Config Commands', () => {
       program.addCommand(configCommand);
 
       // Simulate running "config set server.port 3000"
-      await program.parseAsync(['node', 'wcai', 'config', 'set', 'server.port', '3000'], { from: 'user' });
+      await program.parseAsync(['config', 'set', 'server.port', '3000'], { from: 'user' });
 
       expect(mockGetConfigManager).toHaveBeenCalledWith(process.cwd());
       expect(mockConfigManager.loadConfig).toHaveBeenCalled();
@@ -161,7 +161,9 @@ describe('Config Commands', () => {
       program.addCommand(configCommand);
 
       // Simulate running "config set --global logging.level debug"
-      await program.parseAsync(['node', 'wcai', 'config', 'set', '--global', 'logging.level', 'debug'], { from: 'user' });
+      await program.parseAsync(['config', 'set', '--global', 'logging.level', 'debug'], {
+        from: 'user',
+      });
 
       expect(mockConfigManager.updateConfig).toHaveBeenCalledWith({ logging: { level: 'debug' } });
       expect(mockSaveGlobalConfig).toHaveBeenCalled();
@@ -179,7 +181,7 @@ describe('Config Commands', () => {
       program.addCommand(configCommand);
 
       // Simulate setting a boolean value
-      await program.parseAsync(['node', 'wcai', 'config', 'set', 'server.enabled', 'true'], { from: 'user' });
+      await program.parseAsync(['config', 'set', 'server.enabled', 'true'], { from: 'user' });
 
       expect(mockConfigManager.updateConfig).toHaveBeenCalledWith({ server: { enabled: true } });
     });
@@ -195,10 +197,12 @@ describe('Config Commands', () => {
       program.addCommand(configCommand);
 
       // Simulate setting an array value
-      await program.parseAsync(['node', 'wcai', 'config', 'set', 'manifests.searchPaths', '["./src", "./lib"]'], { from: 'user' });
+      await program.parseAsync(['config', 'set', 'manifests.searchPaths', '["./src", "./lib"]'], {
+        from: 'user',
+      });
 
-      expect(mockConfigManager.updateConfig).toHaveBeenCalledWith({ 
-        manifests: { searchPaths: ['./src', './lib'] } 
+      expect(mockConfigManager.updateConfig).toHaveBeenCalledWith({
+        manifests: { searchPaths: ['./src', './lib'] },
       });
     });
   });
@@ -226,7 +230,7 @@ describe('Config Commands', () => {
       program.addCommand(configCommand);
 
       // Simulate running "config list"
-      await program.parseAsync(['node', 'wcai', 'config', 'list'], { from: 'user' });
+      await program.parseAsync(['config', 'list'], { from: 'user' });
 
       expect(console.log).toHaveBeenCalledWith('Configuration:');
       expect(console.log).toHaveBeenCalledWith('  server.host = 127.0.0.1');
@@ -243,8 +247,8 @@ describe('Config Commands', () => {
       const configCommand = createConfigCommand();
       program.addCommand(configCommand);
 
-      // Simulate running "config reset"
-      await program.parseAsync(['node', 'wcai', 'config', 'reset'], { from: 'user' });
+      // Simulate running "config reset --local --confirm"
+      await program.parseAsync(['config', 'reset', '--local', '--confirm'], { from: 'user' });
 
       expect(mockGetConfigManager).toHaveBeenCalledWith(process.cwd());
       expect(mockConfigManager.resetConfig).toHaveBeenCalled();
@@ -256,8 +260,8 @@ describe('Config Commands', () => {
       const configCommand = createConfigCommand();
       program.addCommand(configCommand);
 
-      // Simulate running "config reset --global"
-      await program.parseAsync(['node', 'wcai', 'config', 'reset', '--global'], { from: 'user' });
+      // Simulate running "config reset --global --confirm"
+      await program.parseAsync(['config', 'reset', '--global', '--confirm'], { from: 'user' });
 
       expect(mockConfigManager.resetConfig).toHaveBeenCalled();
       expect(mockSaveGlobalConfig).toHaveBeenCalled();

@@ -3,8 +3,19 @@ import { ManifestReader } from '../../cem/reader';
 import { Uri } from '../../utils/uri';
 import type { Package } from 'custom-elements-manifest';
 
-// Mock the fs module
+// Mock the fs module and utils
 jest.mock('fs/promises');
+jest.mock('../../utils/logger');
+
+// Mock the uri utils explicitly
+jest.mock('../../utils/uri', () => ({
+  Uri: {
+    file: jest.fn(),
+    parse: jest.fn(),
+  },
+  exists: jest.fn(),
+  readTextFile: jest.fn(),
+}));
 
 const mockManifest: Package = {
   schemaVersion: '1.0.0',
@@ -63,137 +74,171 @@ const mockManifest: Package = {
 
 describe('ManifestReader', () => {
   let reader: ManifestReader;
-  let mockReadFile: jest.MockedFunction<any>;
+  let mockStat: jest.MockedFunction<any>;
+  let mockExists: jest.MockedFunction<any>;
+  let mockReadTextFile: jest.MockedFunction<any>;
+  let manifestUri: Uri;
 
   beforeEach(() => {
-    reader = new ManifestReader();
-    
+    // Create a mock Uri with required methods
+    manifestUri = {
+      fsPath: '/path/to/custom-elements.json',
+      toString: jest.fn().mockReturnValue('file:///path/to/custom-elements.json'),
+    } as any;
+
+    reader = new ManifestReader(manifestUri);
+
+    // Get the mocked functions
+    const uriUtils = require('../../utils/uri');
+    mockExists = uriUtils.exists as jest.MockedFunction<any>;
+    mockReadTextFile = uriUtils.readTextFile as jest.MockedFunction<any>;
+
     // Reset mocks
     jest.clearAllMocks();
-    
-    // Mock fs.readFile
+
+    // Mock fs.stat - use different times to avoid caching issues
     const fs = require('fs/promises');
-    mockReadFile = fs.readFile as jest.MockedFunction<any>;
+    mockStat = fs.stat as jest.MockedFunction<any>;
+    mockStat.mockResolvedValue({ mtime: new Date(Date.now() + Math.random() * 1000) });
   });
 
-  describe('readManifest', () => {
-    it('should read and parse a valid manifest', async () => {
-      const manifestUri = Uri.file('/path/to/custom-elements.json');
-      mockReadFile.mockResolvedValue(JSON.stringify(mockManifest));
+  describe('getAllComponents', () => {
+    it('should read and parse components from a valid manifest', async () => {
+      mockExists.mockResolvedValue(true);
+      mockReadTextFile.mockResolvedValue(JSON.stringify(mockManifest));
 
-      const result = await reader.readManifest(manifestUri);
+      const result = await reader.getAllComponents();
 
-      expect(mockReadFile).toHaveBeenCalledWith('/path/to/custom-elements.json', 'utf8');
-      expect(result).toEqual(mockManifest);
+      expect(mockExists).toHaveBeenCalledWith(manifestUri);
+      expect(mockReadTextFile).toHaveBeenCalledWith(manifestUri);
+      expect(result).toHaveLength(1);
+      expect(result[0].tagName).toBe('my-element');
+      expect(result[0].className).toBe('MyElement');
     });
 
-    it('should throw error for invalid JSON', async () => {
-      const manifestUri = Uri.file('/path/to/invalid.json');
-      mockReadFile.mockResolvedValue('invalid json');
+    it('should return empty array when manifest file does not exist', async () => {
+      mockExists.mockResolvedValue(false);
 
-      await expect(reader.readManifest(manifestUri)).rejects.toThrow();
+      const result = await reader.getAllComponents();
+
+      expect(result).toEqual([]);
+      expect(mockReadTextFile).not.toHaveBeenCalled();
     });
 
-    it('should throw error for file read failure', async () => {
-      const manifestUri = Uri.file('/path/to/missing.json');
-      mockReadFile.mockRejectedValue(new Error('File not found'));
+    it('should return empty array for invalid JSON', async () => {
+      mockExists.mockResolvedValue(true);
+      mockReadTextFile.mockResolvedValue('invalid json');
 
-      await expect(reader.readManifest(manifestUri)).rejects.toThrow('File not found');
+      const result = await reader.getAllComponents();
+
+      expect(result).toEqual([]);
     });
 
-    it('should cache manifest after first read', async () => {
-      const manifestUri = Uri.file('/path/to/cached.json');
-      mockReadFile.mockResolvedValue(JSON.stringify(mockManifest));
+    it('should cache components after first read', async () => {
+      mockExists.mockResolvedValue(true);
+      mockReadTextFile.mockResolvedValue(JSON.stringify(mockManifest));
 
       // First read
-      const result1 = await reader.readManifest(manifestUri);
-      expect(mockReadFile).toHaveBeenCalledTimes(1);
+      const result1 = await reader.getAllComponents();
+      expect(mockReadTextFile).toHaveBeenCalledTimes(1);
 
       // Second read should use cache
-      const result2 = await reader.readManifest(manifestUri);
-      expect(mockReadFile).toHaveBeenCalledTimes(1);
+      const result2 = await reader.getAllComponents();
+      expect(mockReadTextFile).toHaveBeenCalledTimes(1);
       expect(result1).toBe(result2);
     });
   });
 
-  describe('getComponents', () => {
+  describe('getComponentByTagName', () => {
     beforeEach(async () => {
-      const manifestUri = Uri.file('/path/to/test.json');
-      mockReadFile.mockResolvedValue(JSON.stringify(mockManifest));
-      await reader.readManifest(manifestUri);
+      mockExists.mockResolvedValue(true);
+      mockReadTextFile.mockResolvedValue(JSON.stringify(mockManifest));
     });
 
-    it('should extract components from manifest', async () => {
-      const manifestUri = Uri.file('/path/to/test.json');
-      const components = await reader.getComponents(manifestUri);
+    it('should find component by tag name', async () => {
+      const component = await reader.getComponentByTagName('my-element');
 
-      expect(components).toHaveLength(1);
-      expect(components[0]).toMatchObject({
-        name: 'MyElement',
-        tagName: 'my-element',
-        description: 'A custom element for testing',
-        customElement: true,
-      });
+      expect(component).toBeDefined();
+      expect(component?.tagName).toBe('my-element');
+      expect(component?.className).toBe('MyElement');
+      expect(component?.description).toBe('A custom element for testing');
     });
 
-    it('should return empty array for manifest without components', async () => {
-      const emptyManifest: Package = {
-        schemaVersion: '1.0.0',
-        readme: '',
-        modules: [],
-      };
+    it('should return undefined for non-existent tag', async () => {
+      const component = await reader.getComponentByTagName('non-existent');
 
-      const manifestUri = Uri.file('/path/to/empty.json');
-      mockReadFile.mockResolvedValue(JSON.stringify(emptyManifest));
-
-      const components = await reader.getComponents(manifestUri);
-      expect(components).toEqual([]);
+      expect(component).toBeUndefined();
     });
   });
 
-  describe('clearCache', () => {
-    it('should clear manifest cache', async () => {
-      const manifestUri = Uri.file('/path/to/cached.json');
-      mockReadFile.mockResolvedValue(JSON.stringify(mockManifest));
-
-      // Read manifest to populate cache
-      await reader.readManifest(manifestUri);
-      expect(mockReadFile).toHaveBeenCalledTimes(1);
-
-      // Clear cache
-      reader.clearCache();
-
-      // Read again should call fs.readFile again
-      await reader.readManifest(manifestUri);
-      expect(mockReadFile).toHaveBeenCalledTimes(2);
+  describe('getComponentByClassName', () => {
+    beforeEach(async () => {
+      mockExists.mockResolvedValue(true);
+      mockReadTextFile.mockResolvedValue(JSON.stringify(mockManifest));
     });
 
-    it('should clear specific manifest from cache', async () => {
-      const manifestUri1 = Uri.file('/path/to/manifest1.json');
-      const manifestUri2 = Uri.file('/path/to/manifest2.json');
-      
-      mockReadFile.mockResolvedValue(JSON.stringify(mockManifest));
+    it('should find component by class name', async () => {
+      const component = await reader.getComponentByClassName('MyElement');
 
-      // Read both manifests
-      await reader.readManifest(manifestUri1);
-      await reader.readManifest(manifestUri2);
-      expect(mockReadFile).toHaveBeenCalledTimes(2);
+      expect(component).toBeDefined();
+      expect(component?.className).toBe('MyElement');
+      expect(component?.tagName).toBe('my-element');
+    });
 
-      // Clear specific manifest
-      reader.clearCache(manifestUri1);
+    it('should return undefined for non-existent class', async () => {
+      const component = await reader.getComponentByClassName('NonExistent');
 
-      // Read manifest1 again should call fs.readFile
-      await reader.readManifest(manifestUri1);
-      expect(mockReadFile).toHaveBeenCalledTimes(3);
+      expect(component).toBeUndefined();
+    });
+  });
 
-      // Read manifest2 again should use cache
-      await reader.readManifest(manifestUri2);
-      expect(mockReadFile).toHaveBeenCalledTimes(3);
+  describe('clearCaches', () => {
+    it('should clear component caches', async () => {
+      mockExists.mockResolvedValue(true);
+      mockReadTextFile.mockResolvedValue(JSON.stringify(mockManifest));
+
+      // Read components to populate cache
+      await reader.getAllComponents();
+      expect(mockReadTextFile).toHaveBeenCalledTimes(1);
+
+      // Clear caches
+      reader.clearCaches();
+
+      // Read again should use cached manifest but rebuild component caches
+      await reader.getAllComponents();
+      expect(mockReadTextFile).toHaveBeenCalledTimes(1); // Still cached at manifest level
+    });
+  });
+
+  describe('searchComponents', () => {
+    beforeEach(async () => {
+      mockExists.mockResolvedValue(true);
+      mockReadTextFile.mockResolvedValue(JSON.stringify(mockManifest));
+    });
+
+    it('should find components by name', async () => {
+      const results = await reader.searchComponents('MyElement');
+
+      expect(results).toHaveLength(1);
+      expect(results[0].className).toBe('MyElement');
+    });
+
+    it('should find components by tag name', async () => {
+      const results = await reader.searchComponents('my-element');
+
+      expect(results).toHaveLength(1);
+      expect(results[0].tagName).toBe('my-element');
+    });
+
+    it('should return empty array for no matches', async () => {
+      const results = await reader.searchComponents('non-existent');
+
+      expect(results).toEqual([]);
     });
   });
 
   describe('error handling', () => {
-    it('should handle malformed manifest structure', async () => {
+    it('should handle malformed manifest structure gracefully', async () => {
       const malformedManifest = {
         schemaVersion: '1.0.0',
         modules: [
@@ -209,19 +254,21 @@ describe('ManifestReader', () => {
         ],
       };
 
-      const manifestUri = Uri.file('/path/to/malformed.json');
-      mockReadFile.mockResolvedValue(JSON.stringify(malformedManifest));
+      mockExists.mockResolvedValue(true);
+      mockReadTextFile.mockResolvedValue(JSON.stringify(malformedManifest));
 
       // Should not throw, but should handle gracefully
-      const components = await reader.getComponents(manifestUri);
+      const components = await reader.getAllComponents();
       expect(components).toEqual([]);
     });
 
-    it('should handle network URIs', async () => {
-      const networkUri = Uri.parse('https://example.com/manifest.json');
-      
-      // Should throw for network URIs since we only support file URIs
-      await expect(reader.readManifest(networkUri)).rejects.toThrow();
+    it('should handle file read errors gracefully', async () => {
+      mockExists.mockResolvedValue(true);
+      mockReadTextFile.mockRejectedValue(new Error('File read error'));
+
+      // Should not throw, but should return empty array
+      const components = await reader.getAllComponents();
+      expect(components).toEqual([]);
     });
   });
 });
