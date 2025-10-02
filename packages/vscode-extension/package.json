@@ -80,8 +80,13 @@
         },
         "wcai.mcp.useCliServer": {
           "type": "boolean",
-          "default": false,
-          "description": "Use the CLI-based MCP server instead of the built-in server"
+          "default": true,
+          "description": "Use the CLI-based MCP server instead of the built-in server. The CLI provides better performance and additional features. Automatically falls back to built-in server if CLI is not available."
+        },
+        "wcai.mcp.showCliRecommendation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a one-time notification recommending the CLI-based MCP server for better performance"
         }
       }
     },
@@ -94,6 +99,16 @@
       {
         "command": "wcai.mcp.stop",
         "title": "Stop MCP Server",
+        "category": "WCAI"
+      },
+      {
+        "command": "wcai.mcp.restart",
+        "title": "Restart MCP Server",
+        "category": "WCAI"
+      },
+      {
+        "command": "wcai.mcp.showMetrics",
+        "title": "Show MCP Metrics",
         "category": "WCAI"
       },
       {
@@ -139,6 +154,14 @@
         },
         {
           "command": "wcai.mcp.stop",
+          "when": "true"
+        },
+        {
+          "command": "wcai.mcp.restart",
+          "when": "true"
+        },
+        {
+          "command": "wcai.mcp.showMetrics",
           "when": "true"
         },
         {

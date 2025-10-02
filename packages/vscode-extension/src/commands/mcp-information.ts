@@ -1,6 +1,6 @@
 import { window, env } from 'vscode';
 import type { Container } from '../container';
-import type { HttpTransportInfo } from '../mcp/utils/transport';
+import type { McpServerInfo } from '../mcp/types';
 import { executeCommand } from '../system/command';
 import { command } from '../system/decorators/command';
 import { supportsMcpDefinitionProvider, supportsMcpUrlHandler } from '../system/mcp';
@@ -55,7 +55,7 @@ export class McpInformationCommand extends CommandBase {
   }
 }
 
-export async function copyMcpConfig(serverInfo?: HttpTransportInfo): Promise<void> {
+export async function copyMcpConfig(serverInfo?: McpServerInfo): Promise<void> {
   if (!serverInfo) {
     window.showErrorMessage('MCP server is not running.');
     return;

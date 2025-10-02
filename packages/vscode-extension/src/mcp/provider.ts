@@ -10,10 +10,11 @@ import { configuration } from '../system/configuration';
 import { Logger } from '../system/logger';
 import type { HttpTransportInfo } from './utils/transport';
 import { createHttpTransport } from './utils/transport';
+import type { IMcpProvider, McpServerInfo } from './types';
 
 export const MANIFEST_SCHEME = 'manifest' as const;
 
-export class McpProvider implements Disposable {
+export class McpProvider implements IMcpProvider {
   private _disposables: Disposable[] = [];
   private httpTransport: HttpTransportInfo | undefined;
   private _onDidChangeHttpServerState = new EventEmitter<void>();
@@ -50,11 +51,15 @@ export class McpProvider implements Disposable {
     });
   }
 
-  getServerInfo(): HttpTransportInfo | undefined {
+  getServerInfo(): McpServerInfo | undefined {
     if (!this.httpTransport) return undefined;
 
     return {
-      ...this.httpTransport,
+      hostName: this.httpTransport.hostName,
+      port: this.httpTransport.port,
+      url: this.httpTransport.url,
+      mcpUrl: this.httpTransport.mcpUrl,
+      sseUrl: this.httpTransport.sseUrl,
     };
   }
 

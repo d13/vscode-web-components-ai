@@ -23,3 +23,15 @@ export class McpStopCommand extends CommandBase {
     await this._container.mcp.stop();
   }
 }
+
+@command()
+export class McpRestartCommand extends CommandBase {
+  constructor(private readonly _container: Container) {
+    super(_container, 'wcai.mcp.restart');
+  }
+
+  async execute() {
+    await this._container.mcp.stop();
+    await this._container.mcp.start();
+  }
+}

@@ -9,6 +9,8 @@ export interface Config {
     readonly port: number | null;
     readonly host: string | null;
     readonly storeHostAndPortOnStart: boolean;
+    readonly useCliServer: boolean;
+    readonly showCliRecommendation: boolean;
   };
 }
 

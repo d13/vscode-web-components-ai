@@ -4,4 +4,5 @@ import './commands/manifest-tree';
 import './commands/mcp-controls';
 import './commands/mcp-information';
 import './commands/mcp-install';
+import './commands/mcp-metrics';
 import './commands/mcp-tree';

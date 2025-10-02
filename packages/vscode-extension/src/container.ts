@@ -4,7 +4,9 @@ import { ManifestLocationProvider } from './cem/locator';
 import type { CustomElementsManifestReader } from './cem/reader';
 import { ManifestsProvider } from './cem/reader';
 import { getDefinitionProviders } from './mcp/definition-provider.utils';
-import { McpProvider } from './mcp/provider';
+import { createMcpProvider } from './mcp/factory';
+import type { IMcpProvider } from './mcp/types';
+import { McpMonitoringService } from './mcp/monitoring';
 import { configuration } from './system/configuration';
 import { memoize } from './system/decorators/memoize';
 import { Logger } from './system/logger';
@@ -52,7 +54,9 @@ export class Container {
 
     this._disposables.push((this._locator = new ManifestLocationProvider(this)));
     this._cem = new ManifestsProvider(this);
-    this._disposables.push((this._mcp = new McpProvider(this)));
+
+    // Initialize MCP provider asynchronously
+    this.initializeMcpProvider();
 
     // Initialize tree view provider
     this._manifestTreeProvider = new ManifestsView(this);
@@ -110,9 +114,35 @@ export class Container {
     return this._manifestTreeProvider;
   }
 
-  private _mcp: McpProvider;
+  private _mcp!: IMcpProvider;
+  private _mcpMonitoring: McpMonitoringService | undefined;
   get mcp() {
     return this._mcp;
+  }
+
+  get mcpMonitoring() {
+    return this._mcpMonitoring;
+  }
+
+  private async initializeMcpProvider(): Promise<void> {
+    try {
+      this._mcp = await createMcpProvider(this);
+      this._disposables.push(this._mcp);
+
+      // Initialize monitoring service
+      this._mcpMonitoring = new McpMonitoringService(this, this._mcp);
+      this._disposables.push(this._mcpMonitoring);
+    } catch (error) {
+      Logger.error(error, 'Failed to initialize MCP provider');
+      // Fallback to built-in provider
+      const { McpProvider } = await import('./mcp/provider');
+      this._mcp = new McpProvider(this);
+      this._disposables.push(this._mcp);
+
+      // Initialize monitoring for fallback provider too
+      this._mcpMonitoring = new McpMonitoringService(this, this._mcp);
+      this._disposables.push(this._mcpMonitoring);
+    }
   }
 
   private _prerelease: boolean;

@@ -1,7 +1,12 @@
 import * as vscode from 'vscode';
 import { spawn, ChildProcess } from 'child_process';
+import { EventEmitter } from 'vscode';
 import { Logger } from '../system/logger';
-import type { Disposable } from '../system/disposable';
+import { configuration } from '../system/configuration';
+import { executeCommand } from '../system/command';
+import type { Disposable, Event } from 'vscode';
+import type { IMcpProvider, McpServerInfo } from './types';
+import type { Container } from '../container';
 
 export interface CliMcpServerInfo {
   process: ChildProcess;
@@ -12,16 +17,58 @@ export interface CliMcpServerInfo {
   sseUrl: string;
 }
 
-export class CliMcpProvider implements Disposable {
+export class CliMcpProvider implements IMcpProvider {
   private _serverProcess: ChildProcess | undefined;
   private _serverInfo: CliMcpServerInfo | undefined;
   private _disposables: Disposable[] = [];
+  private _onDidChangeHttpServerState = new EventEmitter<void>();
+  private _healthCheckInterval: NodeJS.Timeout | undefined;
+  private _restartAttempts = 0;
+  private _maxRestartAttempts = 3;
+  private _isRestarting = false;
 
-  constructor(private readonly _workspaceRoot: string) {}
+  get onDidChangeHttpServerState(): Event<void> {
+    return this._onDidChangeHttpServerState.event;
+  }
 
-  async start(): Promise<CliMcpServerInfo> {
+  constructor(
+    private readonly _workspaceRoot: string,
+    private readonly _container?: Container,
+  ) {
+    this._disposables.push(
+      this._onDidChangeHttpServerState,
+      configuration.onDidChange(async e => {
+        if (e.affectsConfiguration('mcp.port') || e.affectsConfiguration('mcp.host')) {
+          if (this._serverInfo) {
+            const currentPort = configuration.get('mcp.port');
+            const currentHost = configuration.get('mcp.host');
+
+            if (this._serverInfo.port === currentPort && this._serverInfo.host === currentHost) {
+              return; // No change needed
+            }
+
+            await this.stop();
+          }
+
+          void this.start(true);
+        }
+      }),
+    );
+
+    // Auto-start the server like the built-in provider
+    if (this._container) {
+      const firstMcpStart = this._container.storage.get('firstMcpStartRan') ?? false;
+      void this.start(firstMcpStart).then(() => {
+        if (!firstMcpStart) {
+          void this._container!.storage.store('firstMcpStartRan', true);
+        }
+      });
+    }
+  }
+
+  async start(silent = false): Promise<boolean> {
     if (this._serverProcess) {
-      throw new Error('MCP server is already running');
+      return true; // Already running
     }
 
     Logger.log('Starting MCP server using CLI...');
@@ -35,11 +82,16 @@ export class CliMcpProvider implements Disposable {
     // Build CLI arguments
     const args = [
       'start',
-      '--host', host,
-      '--port', port.toString(),
-      '--transport', 'http',
-      '--log-level', logLevel,
-      '--working-dir', this._workspaceRoot
+      '--host',
+      host,
+      '--port',
+      port.toString(),
+      '--transport',
+      'http',
+      '--log-level',
+      logLevel,
+      '--working-dir',
+      this._workspaceRoot,
     ];
 
     Logger.debug(`Spawning CLI process: wcai ${args.join(' ')}`);
@@ -51,12 +103,12 @@ export class CliMcpProvider implements Disposable {
       env: {
         ...process.env,
         WCAI_LOG_LEVEL: logLevel,
-      }
+      },
     });
 
     // Set up process event handlers
-    this._serverProcess.on('error', (error) => {
-      Logger.error('CLI process error:', error);
+    this._serverProcess.on('error', error => {
+      Logger.error(error, 'CLI process error');
       this.cleanup();
     });
 
@@ -67,24 +119,57 @@ export class CliMcpProvider implements Disposable {
 
     // Capture stdout for server info
     let stdoutData = '';
-    this._serverProcess.stdout?.on('data', (data) => {
+    this._serverProcess.stdout?.on('data', data => {
       const output = data.toString();
       stdoutData += output;
       Logger.debug('CLI stdout:', output.trim());
     });
 
     // Capture stderr for errors
-    this._serverProcess.stderr?.on('data', (data) => {
+    this._serverProcess.stderr?.on('data', data => {
       const output = data.toString();
       Logger.warn('CLI stderr:', output.trim());
     });
 
-    // Wait for server to start and extract connection info
-    const serverInfo = await this.waitForServerStart(stdoutData);
-    this._serverInfo = serverInfo;
+    try {
+      // Wait for server to start and extract connection info
+      const serverInfo = await this.waitForServerStart(stdoutData);
+      this._serverInfo = serverInfo;
 
-    Logger.log(`MCP server started successfully at ${serverInfo.mcpUrl}`);
-    return serverInfo;
+      Logger.log(`MCP server started successfully at ${serverInfo.mcpUrl}`);
+
+      // Store host and port configuration if enabled
+      if (configuration.get('mcp.storeHostAndPortOnStart')) {
+        const configPort = configuration.get('mcp.port');
+        const configHost = configuration.get('mcp.host');
+
+        if (serverInfo.port !== configPort) {
+          configuration.updateEffective('mcp.port', serverInfo.port);
+        }
+        if (serverInfo.host !== configHost) {
+          configuration.updateEffective('mcp.host', serverInfo.host);
+        }
+      }
+
+      if (!silent) {
+        void executeCommand('wcai.mcp.showInformation');
+      }
+
+      // Fire the state change event
+      this._onDidChangeHttpServerState.fire();
+
+      // Start health monitoring
+      this.startHealthMonitoring();
+
+      // Reset restart attempts on successful start
+      this._restartAttempts = 0;
+
+      return true;
+    } catch (error) {
+      Logger.error(error, 'Failed to start CLI MCP server');
+      this.cleanup();
+      return false;
+    }
   }
 
   async stop(): Promise<void> {
@@ -94,11 +179,14 @@ export class CliMcpProvider implements Disposable {
 
     Logger.log('Stopping MCP server...');
 
+    // Stop health monitoring first
+    this.stopHealthMonitoring();
+
     // Try graceful shutdown first
     this._serverProcess.kill('SIGTERM');
 
     // Wait for process to exit
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       if (!this._serverProcess) {
         resolve();
         return;
@@ -120,11 +208,20 @@ export class CliMcpProvider implements Disposable {
     });
 
     this.cleanup();
+    this._onDidChangeHttpServerState.fire();
     Logger.log('MCP server stopped');
   }
 
-  getServerInfo(): CliMcpServerInfo | undefined {
-    return this._serverInfo;
+  getServerInfo(): McpServerInfo | undefined {
+    if (!this._serverInfo) return undefined;
+
+    return {
+      hostName: this._serverInfo.host,
+      port: this._serverInfo.port,
+      url: this._serverInfo.url,
+      mcpUrl: this._serverInfo.mcpUrl,
+      sseUrl: this._serverInfo.sseUrl,
+    };
   }
 
   isRunning(): boolean {
@@ -146,7 +243,7 @@ export class CliMcpProvider implements Disposable {
 
         if (httpMatch && sseMatch) {
           clearTimeout(timeout);
-          
+
           const mcpUrl = httpMatch[1];
           const port = parseInt(httpMatch[2], 10);
           const host = mcpUrl.split('://')[1].split(':')[0];
@@ -169,19 +266,19 @@ export class CliMcpProvider implements Disposable {
 
       // Continue monitoring stdout
       if (this._serverProcess?.stdout) {
-        this._serverProcess.stdout.on('data', (data) => {
+        this._serverProcess.stdout.on('data', data => {
           output += data.toString();
           checkOutput();
         });
       }
 
       // Handle process errors
-      this._serverProcess?.on('error', (error) => {
+      this._serverProcess?.on('error', error => {
         clearTimeout(timeout);
         reject(error);
       });
 
-      this._serverProcess?.on('exit', (code) => {
+      this._serverProcess?.on('exit', code => {
         clearTimeout(timeout);
         reject(new Error(`CLI process exited with code ${code} before server started`));
       });
@@ -189,8 +286,92 @@ export class CliMcpProvider implements Disposable {
   }
 
   private cleanup(): void {
+    this.stopHealthMonitoring();
     this._serverProcess = undefined;
     this._serverInfo = undefined;
+    this._onDidChangeHttpServerState.fire();
+  }
+
+  private startHealthMonitoring(): void {
+    this.stopHealthMonitoring();
+
+    // Check server health every 30 seconds
+    this._healthCheckInterval = setInterval(() => {
+      this.performHealthCheck();
+    }, 30000);
+  }
+
+  private stopHealthMonitoring(): void {
+    if (this._healthCheckInterval) {
+      clearInterval(this._healthCheckInterval);
+      this._healthCheckInterval = undefined;
+    }
+  }
+
+  private async performHealthCheck(): Promise<void> {
+    if (!this._serverProcess || !this._serverInfo) {
+      return;
+    }
+
+    // Check if process is still running
+    if (this._serverProcess.killed || this._serverProcess.exitCode !== null) {
+      Logger.warn('CLI process has died, attempting restart');
+      await this.handleProcessFailure();
+      return;
+    }
+
+    // TODO: Add HTTP health check to verify server is responding
+    // For now, just check process status
+  }
+
+  private async handleProcessFailure(): Promise<void> {
+    if (this._isRestarting) {
+      return; // Already handling restart
+    }
+
+    this._isRestarting = true;
+    this._restartAttempts++;
+
+    if (this._restartAttempts > this._maxRestartAttempts) {
+      Logger.error(new Error('Max restart attempts reached'), 'CLI MCP server failed to restart');
+
+      if (this._container) {
+        // Show error notification to user
+        vscode.window
+          .showErrorMessage(
+            'WCAI CLI MCP server has failed and cannot be restarted. Consider switching to the built-in server.',
+            'Switch to Built-in',
+            'Retry',
+          )
+          .then(action => {
+            if (action === 'Switch to Built-in') {
+              void configuration.updateEffective('mcp.useCliServer', false);
+              vscode.window.showInformationMessage(
+                'Switched to built-in MCP server. Restart the extension to apply changes.',
+              );
+            } else if (action === 'Retry') {
+              this._restartAttempts = 0;
+              void this.start();
+            }
+          });
+      }
+
+      this._isRestarting = false;
+      return;
+    }
+
+    Logger.log(`Attempting to restart CLI MCP server (attempt ${this._restartAttempts}/${this._maxRestartAttempts})`);
+
+    try {
+      await this.stop();
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+      await this.start(true); // Silent restart
+      Logger.log('CLI MCP server restarted successfully');
+    } catch (error) {
+      Logger.error(error, 'Failed to restart CLI MCP server');
+    }
+
+    this._isRestarting = false;
   }
 
   dispose(): void {
@@ -203,17 +384,17 @@ export class CliMcpProvider implements Disposable {
  * Check if the CLI is available in the system PATH
  */
 export async function checkCliAvailability(): Promise<boolean> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const process = spawn('wcai', ['--version'], { stdio: 'pipe' });
-    
+
     process.on('error', () => {
       resolve(false);
     });
-    
-    process.on('exit', (code) => {
+
+    process.on('exit', code => {
       resolve(code === 0);
     });
-    
+
     // Timeout after 5 seconds
     setTimeout(() => {
       process.kill();
@@ -226,26 +407,26 @@ export async function checkCliAvailability(): Promise<boolean> {
  * Get the CLI version if available
  */
 export async function getCliVersion(): Promise<string | undefined> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const process = spawn('wcai', ['--version'], { stdio: 'pipe' });
-    
+
     let output = '';
-    process.stdout?.on('data', (data) => {
+    process.stdout?.on('data', data => {
       output += data.toString();
     });
-    
+
     process.on('error', () => {
       resolve(undefined);
     });
-    
-    process.on('exit', (code) => {
+
+    process.on('exit', code => {
       if (code === 0) {
         resolve(output.trim());
       } else {
         resolve(undefined);
       }
     });
-    
+
     // Timeout after 5 seconds
     setTimeout(() => {
       process.kill();
