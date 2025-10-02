@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import inquirer from 'inquirer';
 import { loadConfig } from '../config';
 import { Logger } from '../utils/logger';
 import { ManifestLocationProvider, ManifestsProvider } from '../cem';
@@ -124,29 +125,17 @@ export function createLocateCommand(): Command {
 export function createIncludeCommand(): Command {
   return new Command('include')
     .description('Include a manifest in component discovery')
-    .argument('<uri>', 'URI of the manifest to include')
+    .argument('[uri]', 'URI of the manifest to include (interactive if not provided)')
     .option('--working-dir <dir>', 'Working directory')
+    .option('--interactive', 'Force interactive mode even if URI is provided')
     .action(async (uri, options) => {
       try {
         const workingDir = options.workingDir || process.cwd();
-        const config = await loadConfig(workingDir);
 
-        // Remove from exclude list if present
-        const updatedExclude = config.manifests.exclude.filter(excluded => excluded !== uri);
-
-        if (updatedExclude.length === config.manifests.exclude.length) {
-          Logger.log(`Manifest ${uri} was not excluded`);
+        if (!uri || options.interactive) {
+          await runInteractiveInclude(workingDir);
         } else {
-          // Update configuration
-          const { getConfigManager, saveLocalConfig } = await import('../config');
-          const configManager = getConfigManager(workingDir);
-          await configManager.loadConfig();
-          configManager.updateConfig({
-            manifests: { exclude: updatedExclude },
-          });
-          await saveLocalConfig(workingDir);
-
-          Logger.log(`Manifest ${uri} included in component discovery`);
+          await includeManifest(uri, workingDir);
         }
       } catch (error) {
         Logger.error('Failed to include manifest:', error);
@@ -158,33 +147,165 @@ export function createIncludeCommand(): Command {
 export function createExcludeCommand(): Command {
   return new Command('exclude')
     .description('Exclude a manifest from component discovery')
-    .argument('<uri>', 'URI of the manifest to exclude')
+    .argument('[uri]', 'URI of the manifest to exclude (interactive if not provided)')
     .option('--working-dir <dir>', 'Working directory')
+    .option('--interactive', 'Force interactive mode even if URI is provided')
     .action(async (uri, options) => {
       try {
         const workingDir = options.workingDir || process.cwd();
-        const config = await loadConfig(workingDir);
 
-        // Add to exclude list if not already present
-        if (config.manifests.exclude.includes(uri)) {
-          Logger.log(`Manifest ${uri} is already excluded`);
+        if (!uri || options.interactive) {
+          await runInteractiveExclude(workingDir);
         } else {
-          const updatedExclude = [...config.manifests.exclude, uri];
-
-          // Update configuration
-          const { getConfigManager, saveLocalConfig } = await import('../config');
-          const configManager = getConfigManager(workingDir);
-          await configManager.loadConfig();
-          configManager.updateConfig({
-            manifests: { exclude: updatedExclude },
-          });
-          await saveLocalConfig(workingDir);
-
-          Logger.log(`Manifest ${uri} excluded from component discovery`);
+          await excludeManifest(uri, workingDir);
         }
       } catch (error) {
         Logger.error('Failed to exclude manifest:', error);
         process.exit(1);
       }
     });
+}
+
+async function includeManifest(uri: string, workingDir: string): Promise<void> {
+  const config = await loadConfig(workingDir);
+
+  // Remove from exclude list if present
+  const updatedExclude = config.manifests.exclude.filter(excluded => excluded !== uri);
+
+  if (updatedExclude.length === config.manifests.exclude.length) {
+    Logger.log(`Manifest ${uri} was not excluded`);
+  } else {
+    // Update configuration
+    const { getConfigManager, saveLocalConfig } = await import('../config');
+    const configManager = getConfigManager(workingDir);
+    await configManager.loadConfig();
+    configManager.updateConfig({
+      manifests: { exclude: updatedExclude },
+    });
+    await saveLocalConfig(workingDir);
+
+    Logger.log(`Manifest ${uri} included in component discovery`);
+  }
+}
+
+async function excludeManifest(uri: string, workingDir: string): Promise<void> {
+  const config = await loadConfig(workingDir);
+
+  // Add to exclude list if not already present
+  if (config.manifests.exclude.includes(uri)) {
+    Logger.log(`Manifest ${uri} is already excluded`);
+  } else {
+    const updatedExclude = [...config.manifests.exclude, uri];
+
+    // Update configuration
+    const { getConfigManager, saveLocalConfig } = await import('../config');
+    const configManager = getConfigManager(workingDir);
+    await configManager.loadConfig();
+    configManager.updateConfig({
+      manifests: { exclude: updatedExclude },
+    });
+    await saveLocalConfig(workingDir);
+
+    Logger.log(`Manifest ${uri} excluded from component discovery`);
+  }
+}
+
+async function runInteractiveInclude(workingDir: string): Promise<void> {
+  const locator = new ManifestLocationProvider(workingDir);
+  const manifests = await locator.getManifests();
+
+  if (manifests.length === 0) {
+    console.log('⚠️  No manifests found in the current workspace');
+    return;
+  }
+
+  const config = await loadConfig(workingDir);
+  const excludedSet = new Set(config.manifests.exclude);
+
+  // Filter to only show excluded manifests
+  const excludedManifests = manifests.filter(manifest => excludedSet.has(manifest.toString()));
+
+  if (excludedManifests.length === 0) {
+    console.log('✅ All manifests are already included');
+    return;
+  }
+
+  const choices = excludedManifests.map(manifest => {
+    const uri = manifest.toString();
+    const type = uri.includes('node_modules') ? 'dependency' : 'local';
+
+    return {
+      name: `${uri} (${type})`,
+      value: uri,
+      checked: false,
+    };
+  });
+
+  const { selectedManifests } = await inquirer.prompt({
+    type: 'checkbox',
+    name: 'selectedManifests',
+    message: 'Select manifests to include:',
+    choices,
+    pageSize: 15,
+    validate: (choices: readonly any[]) => choices.length > 0 || 'Please select at least one manifest',
+  });
+
+  console.log(`\n✅ Including ${selectedManifests.length} manifest(s):`);
+
+  for (const manifest of selectedManifests) {
+    console.log(`   • ${manifest}`);
+    await includeManifest(manifest, workingDir);
+  }
+
+  console.log(`\n✅ Successfully included ${selectedManifests.length} manifest(s)`);
+}
+
+async function runInteractiveExclude(workingDir: string): Promise<void> {
+  const locator = new ManifestLocationProvider(workingDir);
+  const manifests = await locator.getManifests();
+
+  if (manifests.length === 0) {
+    console.log('⚠️  No manifests found in the current workspace');
+    return;
+  }
+
+  const config = await loadConfig(workingDir);
+  const excludedSet = new Set(config.manifests.exclude);
+
+  // Filter to only show included manifests
+  const includedManifests = manifests.filter(manifest => !excludedSet.has(manifest.toString()));
+
+  if (includedManifests.length === 0) {
+    console.log('⚠️  All manifests are already excluded');
+    return;
+  }
+
+  const choices = includedManifests.map(manifest => {
+    const uri = manifest.toString();
+    const type = uri.includes('node_modules') ? 'dependency' : 'local';
+
+    return {
+      name: `${uri} (${type})`,
+      value: uri,
+      checked: false,
+    };
+  });
+
+  const { selectedManifests } = await inquirer.prompt({
+    type: 'checkbox',
+    name: 'selectedManifests',
+    message: 'Select manifests to exclude:',
+    choices,
+    pageSize: 15,
+    validate: (choices: readonly any[]) => choices.length > 0 || 'Please select at least one manifest',
+  });
+
+  console.log(`\n❌ Excluding ${selectedManifests.length} manifest(s):`);
+
+  for (const manifest of selectedManifests) {
+    console.log(`   • ${manifest}`);
+    await excludeManifest(manifest, workingDir);
+  }
+
+  console.log(`\n✅ Successfully excluded ${selectedManifests.length} manifest(s)`);
 }

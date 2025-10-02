@@ -13,6 +13,8 @@ import {
   createStatusCommand,
   createStopCommand,
   createSetupCommand,
+  createInstallCommand,
+  runInteractiveMode,
 } from './commands';
 
 export const program = new Command();
@@ -40,16 +42,9 @@ program.addCommand(createComponentsCommand());
 
 // Setup commands
 program.addCommand(createSetupCommand());
-
-program
-  .command('install')
-  .description('Generate MCP config for AI tools')
-  .action(() => {
-    console.log('Install command - not yet implemented');
-  });
+program.addCommand(createInstallCommand());
 
 // Default action when no command is provided
-program.action(() => {
-  console.log('Interactive mode - not yet implemented');
-  console.log('Use --help to see available commands');
+program.action(async () => {
+  await runInteractiveMode();
 });
