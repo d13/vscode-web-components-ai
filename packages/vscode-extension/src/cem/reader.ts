@@ -236,7 +236,7 @@ export class ManifestReader implements CustomElementsManifestReader {
     }
     const components = getAllComponents(this.manifest);
     this._cachedComponents = components;
-    components.forEach(component => {
+    components.forEach((component: Component) => {
       if (component.tagName) {
         this._cachedComponentsByTag.set(component.tagName, component);
       }

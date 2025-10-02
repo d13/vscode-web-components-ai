@@ -1,14 +1,14 @@
 import { TreeItem, TreeItemCollapsibleState, ThemeIcon, ThemeColor } from 'vscode';
-import type { HttpTransportInfo } from '../../mcp/utils/transport';
+import type { McpServerInfo } from '../../mcp/types';
 
 /**
  * Represents the MCP server status in the tree view
  */
 export class McpServerNode extends TreeItem {
-  public readonly serverInfo: HttpTransportInfo | undefined;
+  public readonly serverInfo: McpServerInfo | undefined;
   public readonly isRunning: boolean;
 
-  constructor(serverInfo: HttpTransportInfo | undefined) {
+  constructor(serverInfo: McpServerInfo | undefined) {
     const isRunning = serverInfo !== undefined;
     const label = isRunning ? `MCP Server: ${serverInfo.url}` : 'MCP Server: Stopped';
 
@@ -31,7 +31,7 @@ export class McpServerNode extends TreeItem {
     }
   }
 
-  private createRunningTooltip(serverInfo: HttpTransportInfo): string {
+  private createRunningTooltip(serverInfo: McpServerInfo): string {
     return [
       `MCP Server running at ${serverInfo.url}`,
       `HTTP: ${serverInfo.mcpUrl}`,

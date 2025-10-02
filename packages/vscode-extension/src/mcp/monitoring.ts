@@ -94,11 +94,7 @@ export class McpMonitoringService implements Disposable {
       Logger.warn(`High MCP error rate detected: ${errorRate.toFixed(1)} errors/hour`);
 
       // Store alert in extension storage for potential user notification
-      void this._container.storage.store('mcpHighErrorRate', {
-        errorRate,
-        errorCount: this._metrics.errorCount,
-        timestamp: Date.now(),
-      });
+      void this._container.storage.store('mcpHighErrorRate', true);
     }
   }
 

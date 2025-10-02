@@ -1,4 +1,4 @@
-import { workspace, window } from 'vscode';
+import { workspace, window, commands } from 'vscode';
 import type { Container } from '../container';
 import { Logger } from '../system/logger';
 import { CliMcpProvider, checkCliAvailability } from './cli-provider';
@@ -52,9 +52,9 @@ async function showCliRequiredNotification(container: Container): Promise<void> 
   );
 
   if (result === installCli) {
-    window.commands.executeCommand('wcai.installCli');
+    void commands.executeCommand('wcai.installCli');
   } else if (result === learnMore) {
-    window.commands.executeCommand('wcai.runCliSetup');
+    void commands.executeCommand('wcai.runCliSetup');
   }
 
   // Mark as shown regardless of user action

@@ -96,9 +96,15 @@ importers:
 
   packages/vscode-extension:
     dependencies:
+      '@wc-toolkit/cem-utilities':
+        specifier: ^1.4.1
+        version: 1.4.1
       '@wcai/cli':
         specifier: workspace:*
         version: link:../cli
+      custom-elements-manifest:
+        specifier: ^2.1.0
+        version: 2.1.0
     devDependencies:
       '@types/vscode':
         specifier: ^1.99.0

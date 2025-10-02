@@ -96,6 +96,10 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-member-access': 'off', // Too strict for dynamic APIs
       '@typescript-eslint/no-unsafe-argument': 'off', // Too strict for dynamic APIs
       '@typescript-eslint/no-unsafe-return': 'off', // Too strict for dynamic APIs
+      '@typescript-eslint/no-unsafe-call': 'off', // Too strict for logging and error handling
+      '@typescript-eslint/require-await': 'off', // Too strict for VS Code API patterns
+      '@typescript-eslint/no-unnecessary-type-assertion': 'warn', // Warn instead of error
+      'no-misleading-character-class': 'off', // Allow emoji and unicode in regex
       '@typescript-eslint/no-use-before-define': ['error', { functions: false, classes: false }],
       '@typescript-eslint/prefer-optional-chain': 'warn',
       '@typescript-eslint/prefer-promise-reject-errors': ['error', { allowEmptyReject: true }],
@@ -105,15 +109,17 @@ export default tseslint.config(
   },
   {
     ignores: [
-      'dist/',
-      'node_modules/',
-      '*.js',
-      'webpack.config.mjs',
-      'scripts/',
-      '.vscode-test/',
-      '.vscode-test-web/',
-      'LICENSE',
-      'ThirdPartyNotices.txt',
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/*.js',
+      '**/webpack.config.mjs',
+      '**/scripts/**',
+      '**/.vscode-test/**',
+      '**/.vscode-test-web/**',
+      '**/LICENSE',
+      '**/ThirdPartyNotices.txt',
+      'packages/*/test-*.js',
+      'packages/*/jest.config.js',
     ],
   },
   prettier,

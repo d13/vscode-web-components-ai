@@ -194,7 +194,9 @@
     "watch": "webpack --watch --mode development"
   },
   "dependencies": {
-    "@wcai/cli": "workspace:*"
+    "@wcai/cli": "workspace:*",
+    "@wc-toolkit/cem-utilities": "^1.4.1",
+    "custom-elements-manifest": "^2.1.0"
   },
   "devDependencies": {
     "@types/vscode": "^1.99.0",

@@ -7,6 +7,8 @@ export type DeprecatedGlobalStorage = {};
 
 export type GlobalStorage = {
   firstMcpStartRan: boolean;
+  hasShownCliRequiredNotification: boolean;
+  mcpHighErrorRate: boolean;
 };
 
 export type DeprecatedWorkspaceStorage = {};
