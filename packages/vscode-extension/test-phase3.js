@@ -10,12 +10,12 @@ const path = require('path');
 
 function testDefaultConfiguration() {
   console.log('🔧 Testing default configuration...');
-  
+
   const packageJsonPath = path.join(__dirname, 'package.json');
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-  
+
   const useCliServerConfig = packageJson.contributes.configuration.properties['wcai.mcp.useCliServer'];
-  
+
   if (useCliServerConfig.default === true) {
     console.log('✅ Default configuration is CLI-based (useCliServer: true)');
     return true;
@@ -27,22 +27,22 @@ function testDefaultConfiguration() {
 
 function testFallbackLogic() {
   console.log('🔄 Testing fallback logic...');
-  
+
   // Check if factory.ts has the enhanced fallback logic
   const factoryPath = path.join(__dirname, 'src', 'mcp', 'factory.ts');
-  
+
   if (!fs.existsSync(factoryPath)) {
     console.log('❌ Factory file not found');
     return false;
   }
-  
+
   const factoryContent = fs.readFileSync(factoryPath, 'utf8');
-  
+
   // Check for key fallback features
   const hasCliUnavailableNotification = factoryContent.includes('showCliUnavailableNotification');
   const hasEnhancedFallback = factoryContent.includes('CLI is not available, falling back to built-in');
   const hasDefaultTrue = factoryContent.includes('?? true'); // Default to true
-  
+
   if (hasCliUnavailableNotification && hasEnhancedFallback && hasDefaultTrue) {
     console.log('✅ Enhanced fallback logic is implemented');
     return true;
@@ -57,23 +57,23 @@ function testFallbackLogic() {
 
 function testMonitoringIntegration() {
   console.log('📊 Testing monitoring integration...');
-  
+
   // Check if monitoring service exists
   const monitoringPath = path.join(__dirname, 'src', 'mcp', 'monitoring.ts');
-  
+
   if (!fs.existsSync(monitoringPath)) {
     console.log('❌ Monitoring service not found');
     return false;
   }
-  
+
   // Check if container integrates monitoring
   const containerPath = path.join(__dirname, 'src', 'container.ts');
   const containerContent = fs.readFileSync(containerPath, 'utf8');
-  
+
   const hasMonitoringImport = containerContent.includes('McpMonitoringService');
   const hasMonitoringInit = containerContent.includes('new McpMonitoringService');
   const hasMonitoringGetter = containerContent.includes('get mcpMonitoring()');
-  
+
   if (hasMonitoringImport && hasMonitoringInit && hasMonitoringGetter) {
     console.log('✅ Monitoring integration is complete');
     return true;
@@ -88,27 +88,25 @@ function testMonitoringIntegration() {
 
 function testMetricsCommand() {
   console.log('📈 Testing metrics command...');
-  
+
   // Check if metrics command exists
   const metricsPath = path.join(__dirname, 'src', 'commands', 'mcp-metrics.ts');
-  
+
   if (!fs.existsSync(metricsPath)) {
     console.log('❌ Metrics command not found');
     return false;
   }
-  
+
   // Check if command is registered in package.json
   const packageJsonPath = path.join(__dirname, 'package.json');
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-  
-  const hasMetricsCommand = packageJson.contributes.commands.some(cmd => 
-    cmd.command === 'wcai.mcp.showMetrics'
+
+  const hasMetricsCommand = packageJson.contributes.commands.some(cmd => cmd.command === 'wcai.mcp.showMetrics');
+
+  const hasMetricsCommandPalette = packageJson.contributes.menus.commandPalette.some(
+    menu => menu.command === 'wcai.mcp.showMetrics',
   );
-  
-  const hasMetricsCommandPalette = packageJson.contributes.menus.commandPalette.some(menu =>
-    menu.command === 'wcai.mcp.showMetrics'
-  );
-  
+
   if (hasMetricsCommand && hasMetricsCommandPalette) {
     console.log('✅ Metrics command is properly registered');
     return true;
@@ -122,22 +120,22 @@ function testMetricsCommand() {
 
 async function runPhase3Tests() {
   console.log('🧪 Starting Phase 3: CLI as Default Tests\n');
-  
+
   const results = {
     defaultConfig: testDefaultConfiguration(),
     fallbackLogic: testFallbackLogic(),
     monitoringIntegration: testMonitoringIntegration(),
-    metricsCommand: testMetricsCommand()
+    metricsCommand: testMetricsCommand(),
   };
-  
+
   console.log('\n📊 Phase 3 Test Results:');
   console.log('- Default Configuration:', results.defaultConfig ? '✅' : '❌');
   console.log('- Fallback Logic:', results.fallbackLogic ? '✅' : '❌');
   console.log('- Monitoring Integration:', results.monitoringIntegration ? '✅' : '❌');
   console.log('- Metrics Command:', results.metricsCommand ? '✅' : '❌');
-  
+
   const allPassed = Object.values(results).every(result => result === true);
-  
+
   if (allPassed) {
     console.log('\n🎉 Phase 3: CLI as Default - All tests passed!');
     console.log('✅ Extension now defaults to CLI-based MCP server');

@@ -9,8 +9,8 @@ function replacer(key: string, value: any): any {
 
   if (value instanceof Error) return String(value);
   if (value instanceof Uri) {
-    if ('sha' in (value as any) && (value as any).sha) {
-      return `${(value as any).sha}:${value.toString()}`;
+    if ('sha' in value && value.sha) {
+      return `${value.sha}:${value.toString()}`;
     }
     return value.toString();
   }

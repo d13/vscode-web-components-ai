@@ -8,7 +8,7 @@ export class Uri {
     public readonly authority: string,
     public readonly path: string,
     public readonly query: string,
-    public readonly fragment: string
+    public readonly fragment: string,
   ) {}
 
   static file(path: string): Uri {
@@ -24,7 +24,7 @@ export class Uri {
         url.hostname + (url.port ? `:${url.port}` : ''),
         url.pathname,
         url.search.slice(1), // Remove leading '?'
-        url.hash.slice(1) // Remove leading '#'
+        url.hash.slice(1), // Remove leading '#'
       );
     } catch {
       // Fallback for file paths
@@ -48,7 +48,7 @@ export class Uri {
     if (this.scheme === 'file') {
       return `file://${this.path}`;
     }
-    
+
     let result = `${this.scheme}://`;
     if (this.authority) {
       result += this.authority;

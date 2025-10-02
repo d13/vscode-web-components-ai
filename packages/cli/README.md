@@ -23,16 +23,19 @@ yarn add @wcai/cli
 ## Quick Start
 
 1. **Install the CLI globally:**
+
    ```bash
    npm install -g @wcai/cli
    ```
 
 2. **Run the setup wizard:**
+
    ```bash
    wcai setup
    ```
 
 3. **Start the MCP server:**
+
    ```bash
    wcai start
    ```
@@ -234,6 +237,7 @@ The CLI provides the following MCP tools for AI assistants:
 Search for web components by name, tag, or description.
 
 **Parameters:**
+
 - `query` (string): Search term
 - `matching` (string, optional): Matching strategy - "any", "all", or "strict"
 
@@ -242,6 +246,7 @@ Search for web components by name, tag, or description.
 Get detailed information about a component by its tag name.
 
 **Parameters:**
+
 - `tagName` (string): The tag name of the component
 
 ### `get-web-component-details-by-class-name`
@@ -249,6 +254,7 @@ Get detailed information about a component by its tag name.
 Get detailed information about a component by its class name.
 
 **Parameters:**
+
 - `className` (string): The class name of the component
 
 ### `list-all-web-components`
@@ -256,6 +262,7 @@ Get detailed information about a component by its class name.
 List all available web components.
 
 **Parameters:**
+
 - `includeDetails` (boolean, optional): Include full component details
 
 ## MCP Resources

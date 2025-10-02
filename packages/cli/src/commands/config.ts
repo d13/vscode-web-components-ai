@@ -3,8 +3,7 @@ import { loadConfig, getConfigManager, saveLocalConfig, saveGlobalConfig } from 
 import { Logger } from '../utils/logger';
 
 export function createConfigCommand(): Command {
-  const configCmd = new Command('config')
-    .description('Manage configuration settings');
+  const configCmd = new Command('config').description('Manage configuration settings');
 
   // Get configuration
   configCmd
@@ -13,11 +12,11 @@ export function createConfigCommand(): Command {
     .option('--working-dir <dir>', 'Working directory')
     .option('--global', 'Show global configuration only')
     .option('--local', 'Show local configuration only')
-    .action(async (options) => {
+    .action(async options => {
       try {
         const workingDir = options.workingDir || process.cwd();
         const config = await loadConfig(workingDir);
-        
+
         console.log(JSON.stringify(config, null, 2));
       } catch (error) {
         Logger.error('Failed to get configuration:', error);
@@ -38,13 +37,13 @@ export function createConfigCommand(): Command {
       try {
         const workingDir = options.workingDir || process.cwd();
         const configManager = getConfigManager(workingDir);
-        
+
         await configManager.loadConfig();
-        
+
         // Parse the key path and value
         const keyPath = key.split('.');
         const parsedValue = parseConfigValue(value);
-        
+
         // Build the update object
         const updates: any = {};
         let current = updates;
@@ -53,9 +52,9 @@ export function createConfigCommand(): Command {
           current = current[keyPath[i]];
         }
         current[keyPath[keyPath.length - 1]] = parsedValue;
-        
+
         configManager.updateConfig(updates);
-        
+
         // Save configuration
         if (options.global) {
           await saveGlobalConfig(workingDir);
@@ -64,7 +63,7 @@ export function createConfigCommand(): Command {
           await saveLocalConfig(workingDir);
           Logger.log(`Configuration saved to local config`);
         }
-        
+
         Logger.log(`Set ${key} = ${JSON.stringify(parsedValue)}`);
       } catch (error) {
         Logger.error('Failed to set configuration:', error);
@@ -77,27 +76,27 @@ export function createConfigCommand(): Command {
     .command('list')
     .description('List all configuration keys and their current values')
     .option('--working-dir <dir>', 'Working directory')
-    .action(async (options) => {
+    .action(async options => {
       try {
         const workingDir = options.workingDir || process.cwd();
         const config = await loadConfig(workingDir);
-        
+
         console.log('Configuration keys and values:');
         console.log('');
-        
+
         // Server configuration
         console.log('Server:');
         console.log(`  server.host = ${JSON.stringify(config.server.host)}`);
         console.log(`  server.port = ${JSON.stringify(config.server.port)}`);
         console.log(`  server.transport = ${JSON.stringify(config.server.transport)}`);
         console.log('');
-        
+
         // Manifests configuration
         console.log('Manifests:');
         console.log(`  manifests.exclude = ${JSON.stringify(config.manifests.exclude)}`);
         console.log(`  manifests.searchPaths = ${JSON.stringify(config.manifests.searchPaths)}`);
         console.log('');
-        
+
         // Logging configuration
         console.log('Logging:');
         console.log(`  logging.level = ${JSON.stringify(config.logging.level)}`);
@@ -118,20 +117,20 @@ export function createConfigCommand(): Command {
     .option('--global', 'Reset global configuration')
     .option('--local', 'Reset local configuration')
     .option('--confirm', 'Skip confirmation prompt')
-    .action(async (options) => {
+    .action(async options => {
       try {
         if (!options.confirm) {
           console.log('This will reset configuration to defaults. Use --confirm to proceed.');
           process.exit(1);
         }
-        
+
         const workingDir = options.workingDir || process.cwd();
         const configManager = getConfigManager(workingDir);
-        
+
         // Reset to defaults
         await configManager.loadConfig();
         configManager.updateConfig({});
-        
+
         // Save configuration
         if (options.global) {
           await saveGlobalConfig(workingDir);

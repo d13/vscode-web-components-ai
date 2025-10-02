@@ -10,16 +10,16 @@ const path = require('path');
 
 async function testCliAvailability() {
   console.log('🔍 Testing CLI availability...');
-  
-  return new Promise((resolve) => {
+
+  return new Promise(resolve => {
     const child = spawn('wcai', ['--version'], { stdio: 'pipe' });
-    
+
     let output = '';
-    child.stdout.on('data', (data) => {
+    child.stdout.on('data', data => {
       output += data.toString();
     });
-    
-    child.on('close', (code) => {
+
+    child.on('close', code => {
       if (code === 0) {
         console.log('✅ CLI is available:', output.trim());
         resolve(true);
@@ -28,8 +28,8 @@ async function testCliAvailability() {
         resolve(false);
       }
     });
-    
-    child.on('error', (error) => {
+
+    child.on('error', error => {
       console.log('❌ CLI is not available:', error.message);
       resolve(false);
     });
@@ -38,31 +38,31 @@ async function testCliAvailability() {
 
 async function testCliStart() {
   console.log('🚀 Testing CLI start command...');
-  
-  return new Promise((resolve) => {
-    const child = spawn('wcai', ['start', '--port', '0', '--host', '127.0.0.1'], { 
+
+  return new Promise(resolve => {
+    const child = spawn('wcai', ['start', '--port', '0', '--host', '127.0.0.1'], {
       stdio: 'pipe',
-      cwd: process.cwd()
+      cwd: process.cwd(),
     });
-    
+
     let output = '';
     let errorOutput = '';
-    
-    child.stdout.on('data', (data) => {
+
+    child.stdout.on('data', data => {
       output += data.toString();
       console.log('📤 CLI stdout:', data.toString().trim());
     });
-    
-    child.stderr.on('data', (data) => {
+
+    child.stderr.on('data', data => {
       errorOutput += data.toString();
       console.log('📤 CLI stderr:', data.toString().trim());
     });
-    
+
     // Give it 5 seconds to start
     setTimeout(() => {
       console.log('⏰ Stopping CLI after 5 seconds...');
       child.kill('SIGTERM');
-      
+
       setTimeout(() => {
         if (!child.killed) {
           console.log('🔪 Force killing CLI...');
@@ -70,14 +70,15 @@ async function testCliStart() {
         }
       }, 2000);
     }, 5000);
-    
-    child.on('close', (code) => {
+
+    child.on('close', code => {
       console.log('🏁 CLI process closed with code:', code);
-      
+
       // Check if we got expected output
-      const hasServerInfo = output.includes('Server started') || output.includes('MCP server') || output.includes('port');
+      const hasServerInfo =
+        output.includes('Server started') || output.includes('MCP server') || output.includes('port');
       const hasError = errorOutput.includes('Error') || errorOutput.includes('error');
-      
+
       if (hasServerInfo && !hasError) {
         console.log('✅ CLI start test passed');
         resolve(true);
@@ -89,8 +90,8 @@ async function testCliStart() {
         resolve(true); // Assume success if no errors
       }
     });
-    
-    child.on('error', (error) => {
+
+    child.on('error', error => {
       console.log('❌ CLI start test failed:', error.message);
       resolve(false);
     });
@@ -99,16 +100,16 @@ async function testCliStart() {
 
 async function testConfigurationTypes() {
   console.log('🔧 Testing configuration types...');
-  
+
   // Test that our configuration paths are valid
   const configPaths = [
     'mcp.useCliServer',
     'mcp.showCliRecommendation',
     'mcp.host',
     'mcp.port',
-    'mcp.storeHostAndPortOnStart'
+    'mcp.storeHostAndPortOnStart',
   ];
-  
+
   console.log('📋 Configuration paths to test:', configPaths);
   console.log('✅ Configuration types test passed (static validation)');
   return true;
@@ -116,25 +117,25 @@ async function testConfigurationTypes() {
 
 async function runTests() {
   console.log('🧪 Starting CLI Integration Tests\n');
-  
+
   const results = {
     cliAvailability: await testCliAvailability(),
     cliStart: false, // Skip for now to avoid hanging
-    configTypes: await testConfigurationTypes()
+    configTypes: await testConfigurationTypes(),
   };
-  
+
   // Only test CLI start if CLI is available
   if (results.cliAvailability) {
     results.cliStart = await testCliStart();
   }
-  
+
   console.log('\n📊 Test Results:');
   console.log('- CLI Availability:', results.cliAvailability ? '✅' : '❌');
   console.log('- CLI Start:', results.cliStart ? '✅' : '❌');
   console.log('- Config Types:', results.configTypes ? '✅' : '❌');
-  
+
   const allPassed = Object.values(results).every(result => result === true);
-  
+
   if (allPassed) {
     console.log('\n🎉 All tests passed!');
     process.exit(0);

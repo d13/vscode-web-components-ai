@@ -19,11 +19,11 @@ export class EventEmitter<T> implements Disposable {
       }
 
       this._emitter.on('event', listener);
-      
+
       return {
         dispose: () => {
           this._emitter.removeListener('event', listener);
-        }
+        },
       };
     };
   }

@@ -3,7 +3,7 @@
 import { program } from './cli';
 
 // Handle uncaught exceptions and rejections
-process.on('uncaughtException', (error) => {
+process.on('uncaughtException', error => {
   console.error('Uncaught Exception:', error);
   process.exit(1);
 });
@@ -14,7 +14,7 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Parse command line arguments and execute
-program.parseAsync(process.argv).catch((error) => {
+program.parseAsync(process.argv).catch(error => {
   console.error('CLI Error:', error);
   process.exit(1);
 });

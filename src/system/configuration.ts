@@ -116,8 +116,8 @@ export class Configuration implements Disposable {
     if (e == null) return true;
 
     return Array.isArray(section)
-      ? section.some(s => e.affectsConfiguration(`${extensionPrefix}.${s}`, scope!))
-      : e.affectsConfiguration(`${extensionPrefix}.${section}`, scope!);
+      ? section.some(s => e.affectsConfiguration(`${extensionPrefix}.${s}`, scope))
+      : e.affectsConfiguration(`${extensionPrefix}.${section}`, scope);
   }
 
   changedAny<S extends string>(
@@ -128,8 +128,8 @@ export class Configuration implements Disposable {
     if (e == null) return true;
 
     return Array.isArray(section)
-      ? section.some(s => e.affectsConfiguration(s, scope!))
-      : e.affectsConfiguration(section, scope!);
+      ? section.some(s => e.affectsConfiguration(s, scope))
+      : e.affectsConfiguration(section, scope);
   }
 
   changedCore<S extends CoreConfigPath>(
@@ -140,8 +140,8 @@ export class Configuration implements Disposable {
     if (e == null) return true;
 
     return Array.isArray(section)
-      ? section.some(s => e.affectsConfiguration(s, scope!))
-      : e.affectsConfiguration(section, scope!);
+      ? section.some(s => e.affectsConfiguration(s, scope))
+      : e.affectsConfiguration(section, scope);
   }
 
   inspect<S extends ConfigPath, V extends ConfigPathValue<S>>(

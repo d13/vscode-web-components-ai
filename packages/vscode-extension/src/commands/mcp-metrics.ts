@@ -1,4 +1,4 @@
-import { window } from 'vscode';
+import { window, env } from 'vscode';
 import type { Container } from '../container';
 import { command } from '../system/decorators/command';
 import { CommandBase } from './base';
@@ -11,7 +11,7 @@ export class McpMetricsCommand extends CommandBase {
 
   async execute() {
     const monitoring = this.container.mcpMonitoring;
-    
+
     if (!monitoring) {
       window.showErrorMessage('MCP monitoring is not available.');
       return;
@@ -19,17 +19,15 @@ export class McpMetricsCommand extends CommandBase {
 
     const metrics = monitoring.getMetrics();
     const serverInfo = this.container.mcp.getServerInfo();
-    
+
     // Format uptime
     const uptimeMinutes = Math.floor(metrics.uptime / (1000 * 60));
     const uptimeHours = Math.floor(uptimeMinutes / 60);
     const remainingMinutes = uptimeMinutes % 60;
-    const uptimeStr = uptimeHours > 0 
-      ? `${uptimeHours}h ${remainingMinutes}m`
-      : `${uptimeMinutes}m`;
+    const uptimeStr = uptimeHours > 0 ? `${uptimeHours}h ${remainingMinutes}m` : `${uptimeMinutes}m`;
 
     // Format last error
-    const lastErrorStr = metrics.lastError 
+    const lastErrorStr = metrics.lastError
       ? `${metrics.lastError.message} (${new Date(metrics.lastError.timestamp).toLocaleTimeString()})`
       : 'None';
 
@@ -42,7 +40,7 @@ export class McpMetricsCommand extends CommandBase {
       `**Restart Count:** ${metrics.restartCount}`,
       `**Error Count:** ${metrics.errorCount}`,
       `**Last Error:** ${lastErrorStr}`,
-      ``
+      ``,
     ];
 
     if (serverInfo) {
@@ -51,7 +49,7 @@ export class McpMetricsCommand extends CommandBase {
         `- Host: ${serverInfo.hostName}:${serverInfo.port}`,
         `- HTTP: ${serverInfo.mcpUrl}`,
         `- SSE: ${serverInfo.sseUrl}`,
-        ``
+        ``,
       );
     }
 
@@ -64,7 +62,7 @@ export class McpMetricsCommand extends CommandBase {
       { modal: true },
       resetMetrics,
       copyMetrics,
-      close
+      close,
     );
 
     if (result === resetMetrics) {
@@ -76,14 +74,18 @@ export class McpMetricsCommand extends CommandBase {
   }
 
   private async copyMetricsToClipboard(metrics: any, serverInfo: any): Promise<void> {
-    const metricsJson = JSON.stringify({
-      timestamp: new Date().toISOString(),
-      metrics,
-      serverInfo
-    }, null, 2);
+    const metricsJson = JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        metrics,
+        serverInfo,
+      },
+      null,
+      2,
+    );
 
     try {
-      await window.env.clipboard.writeText(metricsJson);
+      await env.clipboard.writeText(metricsJson);
       window.showInformationMessage('📋 MCP metrics copied to clipboard.');
     } catch (error) {
       window.showErrorMessage('Failed to copy metrics to clipboard.');

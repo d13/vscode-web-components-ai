@@ -93,9 +93,6 @@ Using the copied configuration, manually add the MCP server into your `.vscode/m
 
 </details>
 
-
-
-
 ### Cursor
 
 Copy the MCP server configuration from the VS Code notification and paste it into your `.cursor/mcp.json`:
@@ -117,6 +114,7 @@ Copy the MCP server configuration from the VS Code notification and paste it int
   }
 }
 ```
+
 </details>
 
 ### Claude Desktop
@@ -157,6 +155,7 @@ Add a `.mcp.json` file in the the root of your project:
   }
 }
 ```
+
 </details>
 
 ### Trae
@@ -177,6 +176,7 @@ Add a `.mcp.json` file in the the root of your project:
   }
 }
 ```
+
 </details>
 
 > NOTE: Only one MCP server entry is allowed at a time.
@@ -202,6 +202,7 @@ You can add an MCP server to Cascade by adding the following configuration to yo
   }
 }
 ```
+
 </details>
 
 ### Void
@@ -225,6 +226,7 @@ Copy the MCP server configuration from the VS Code notification and paste it int
   }
 }
 ```
+
 </details>
 
 ### Cline
@@ -250,6 +252,7 @@ Copy the MCP server configuration from the VS Code notification and paste it int
   }
 }
 ```
+
 </details>
 
 ### Augment
@@ -291,6 +294,7 @@ Using `settings.json`:
   }
 }
 ```
+
 </details>
 
 ### AMP
@@ -312,6 +316,7 @@ Using `settings.json`:
   }
 }
 ```
+
 </details>
 
 ### Kiro

@@ -20,10 +20,10 @@ export function createStatusCommand(): Command {
   return new Command('status')
     .description('Check MCP server status')
     .option('--format <format>', 'Output format (table, json)', /^(table|json)$/, 'table')
-    .action(async (options) => {
+    .action(async options => {
       try {
         const status = await getServerStatus();
-        
+
         if (options.format === 'json') {
           console.log(JSON.stringify(status, null, 2));
         } else {
@@ -57,23 +57,23 @@ export function createStopCommand(): Command {
   return new Command('stop')
     .description('Stop the MCP server')
     .option('--force', 'Force stop the server')
-    .action(async (options) => {
+    .action(async options => {
       try {
         const status = await getServerStatus();
-        
+
         if (!status.pid) {
           console.log('MCP server is not running');
           return;
         }
-        
+
         try {
           // Try to terminate the process gracefully
           process.kill(status.pid, options.force ? 'SIGKILL' : 'SIGTERM');
-          
+
           // Wait a bit for graceful shutdown
           if (!options.force) {
             await new Promise(resolve => setTimeout(resolve, 2000));
-            
+
             // Check if process is still running
             try {
               process.kill(status.pid, 0);
@@ -84,10 +84,10 @@ export function createStopCommand(): Command {
               // Process has terminated
             }
           }
-          
+
           // Clean up status files
           await cleanupServerFiles();
-          
+
           console.log(`MCP server (PID ${status.pid}) stopped`);
         } catch (error: any) {
           if (error.code === 'ESRCH') {
@@ -110,11 +110,11 @@ async function getServerStatus(): Promise<ServerStatus> {
     // Check if PID file exists
     const pidContent = await fs.readFile(SERVER_PID_FILE, 'utf8');
     const pid = parseInt(pidContent.trim(), 10);
-    
+
     if (isNaN(pid)) {
       return {};
     }
-    
+
     // Check if process is actually running
     try {
       process.kill(pid, 0);
@@ -126,7 +126,7 @@ async function getServerStatus(): Promise<ServerStatus> {
       }
       throw error;
     }
-    
+
     // Try to read server info
     let serverInfo: any = { pid };
     try {
@@ -136,7 +136,7 @@ async function getServerStatus(): Promise<ServerStatus> {
     } catch {
       // Info file doesn't exist or is invalid, that's ok
     }
-    
+
     return serverInfo;
   } catch (error: any) {
     if (error.code === 'ENOENT') {
@@ -154,7 +154,7 @@ async function cleanupServerFiles(): Promise<void> {
       Logger.warn('Failed to remove PID file:', error);
     }
   }
-  
+
   try {
     await fs.unlink(SERVER_INFO_FILE);
   } catch (error: any) {
@@ -168,7 +168,7 @@ export async function saveServerStatus(status: Omit<ServerStatus, 'pid'>): Promi
   try {
     // Save PID
     await fs.writeFile(SERVER_PID_FILE, process.pid.toString());
-    
+
     // Save server info
     const serverInfo = {
       ...status,

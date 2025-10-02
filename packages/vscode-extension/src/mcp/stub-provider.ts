@@ -26,12 +26,12 @@ export class StubMcpProvider implements IMcpProvider {
   async start(silent = false): Promise<boolean> {
     const errorMessage = this._error instanceof Error ? this._error.message : String(this._error);
     Logger.error(this._error, 'Cannot start MCP server: CLI is not available');
-    
+
     if (!silent) {
       // The factory already shows the notification, so we don't need to show another one
       Logger.warn('MCP server cannot be started because CLI is not available');
     }
-    
+
     return false;
   }
 

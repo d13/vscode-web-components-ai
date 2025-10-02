@@ -50,7 +50,7 @@ export class ManifestLocationProvider implements Disposable {
 
   async locate(options?: ManifestLocateOptions): Promise<Uri[]> {
     const { force, silent, workingDirectory } = options ?? {};
-    
+
     if (workingDirectory) {
       this._workingDirectory = workingDirectory;
     }
@@ -112,12 +112,12 @@ export class ManifestLocationProvider implements Disposable {
     try {
       const pattern = path.join(this._workingDirectory, '**/package.json');
       const excludePattern = path.join(this._workingDirectory, '**/node_modules/**/package.json');
-      
-      const files = await glob(pattern, { 
+
+      const files = await glob(pattern, {
         ignore: [excludePattern],
-        absolute: true 
+        absolute: true,
       });
-      
+
       localPackages.push(...files.map(f => Uri.file(f)));
     } catch (error) {
       Logger.error('ManifestLocationProvider.findLocalPackages', error);
@@ -128,14 +128,14 @@ export class ManifestLocationProvider implements Disposable {
 
   private async findLocalManifests(): Promise<Uri[]> {
     const localManifests: Uri[] = [];
-    
+
     try {
       const pattern = path.join(this._workingDirectory, '**/custom-elements.json');
       const excludePattern = path.join(this._workingDirectory, '**/node_modules/**/custom-elements.json');
-      
-      const files = await glob(pattern, { 
+
+      const files = await glob(pattern, {
         ignore: [excludePattern],
-        absolute: true 
+        absolute: true,
       });
 
       for (const file of files) {
@@ -151,13 +151,13 @@ export class ManifestLocationProvider implements Disposable {
     } catch (error) {
       Logger.error('ManifestLocationProvider.findLocalManifests', error);
     }
-    
+
     return localManifests;
   }
 
   private async findManifestsFromPackage(
     packageUri: Uri,
-    options?: { includeDependencies?: boolean; isLocal?: boolean }
+    options?: { includeDependencies?: boolean; isLocal?: boolean },
   ): Promise<Uri[]> {
     const manifests: Uri[] = [];
 
@@ -186,12 +186,12 @@ export class ManifestLocationProvider implements Disposable {
         };
 
         const nodeModulesPath = path.resolve(path.dirname(packageUri.fsPath), 'node_modules');
-        
+
         for (const [depName] of Object.entries(dependencies)) {
           try {
             const depPackagePath = path.join(nodeModulesPath, depName, 'package.json');
             const depPackageUri = Uri.file(depPackagePath);
-            
+
             // Check if dependency package.json exists
             try {
               await fs.access(depPackagePath);
@@ -211,7 +211,7 @@ export class ManifestLocationProvider implements Disposable {
     } catch (error) {
       Logger.error('ManifestLocationProvider.findManifestsFromPackage', error);
     }
-    
+
     return manifests;
   }
 

@@ -4,7 +4,7 @@ import { jest } from '@jest/globals';
 beforeEach(() => {
   // Reset all mocks before each test
   jest.clearAllMocks();
-  
+
   // Mock console methods to avoid noise in test output
   jest.spyOn(console, 'log').mockImplementation(() => {});
   jest.spyOn(console, 'warn').mockImplementation(() => {});
@@ -27,7 +27,7 @@ global.testUtils = {
     fsPath: path,
     toString: () => `file://${path}`,
   }),
-  
+
   // Helper to create mock manifests
   createMockManifest: (components: any[] = []) => ({
     schemaVersion: '1.0.0',
@@ -36,14 +36,16 @@ global.testUtils = {
       kind: 'javascript-module',
       path: `./src/${component.tagName}.js`,
       declarations: [component],
-      exports: [{
-        kind: 'js',
-        name: component.name,
-        declaration: { name: component.name, module: `./src/${component.tagName}.js` },
-      }],
+      exports: [
+        {
+          kind: 'js',
+          name: component.name,
+          declaration: { name: component.name, module: `./src/${component.tagName}.js` },
+        },
+      ],
     })),
   }),
-  
+
   // Helper to create mock components
   createMockComponent: (overrides: any = {}) => ({
     kind: 'class',

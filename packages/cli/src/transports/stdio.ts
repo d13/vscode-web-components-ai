@@ -15,11 +15,7 @@ export async function createStdioTransport(
   Logger.debug('Creating STDIO transport');
 
   const transport = new StdioServerTransport();
-  const server = createMcpServer(
-    options?.mcp?.name || 'wcai-server',
-    options?.mcp?.version || '1.0.0',
-    cemReader
-  );
+  const server = createMcpServer(options?.mcp?.name || 'wcai-server', options?.mcp?.version || '1.0.0', cemReader);
 
   // Connect the server to the transport
   await server.connect(transport);
@@ -60,11 +56,10 @@ export function startStdioServer(
       };
 
       // Handle transport errors
-      transport.onerror = (error) => {
+      transport.onerror = error => {
         Logger.error('STDIO transport error:', error);
         reject(error);
       };
-
     } catch (error) {
       Logger.error('Failed to start STDIO server:', error);
       reject(error);
