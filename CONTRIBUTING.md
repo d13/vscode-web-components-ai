@@ -28,7 +28,8 @@ packages/
 
 For those using [nvm](https://github.com/nvm-sh/nvm), simply run the following command to install the required version of NodeJS:
 
-```
+```bash
+nvm install # if not already installed
 nvm use
 ```
 

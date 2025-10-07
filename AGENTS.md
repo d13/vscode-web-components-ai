@@ -5,20 +5,20 @@
 
 ## Project Overview
 
-This is a VS Code extension that provides web component information to AI assistants via Model Context Protocol (MCP). The extension discovers custom elements manifests in workspaces and exposes them through an MCP server with HTTP/SSE transports.
+This is a monorepo containing both a standalone CLI and a VS Code extension that provide web component information to AI assistants via Model Context Protocol (MCP). The tools discover custom elements manifests in workspaces and expose them through MCP servers with HTTP/SSE/STDIO transports. The VS Code extension now uses the standalone CLI as its primary MCP server implementation.
 
 ## Common Commands
 
 ### Prerequisites
 
-- `nvm use` - Switch to the correct Node.js version
+- `nvm use` - Switch to the correct Node.js version (use `nvm install` first, if needed)
 - `corepack enable` - Enable corepack for package manager
 - `pnpm install` - Install dependencies
 
 ### Development
 
-- `pnpm run build` - Build extension in development mode
-- `pnpm run bundle` - Build extension for production
+- `pnpm run build` - Build all packages in development mode
+- `pnpm run bundle` - Build all packages for production
 - `pnpm run watch` - Watch mode for development
 - `pnpm run clean` - Clean build artifacts
 
@@ -28,6 +28,12 @@ This is a VS Code extension that provides web component information to AI assist
 - `pnpm run lint:fix` - Run ESLint with auto-fix
 - `pnpm run format` - Format code with Prettier
 - `pnpm run format:check` - Check code formatting
+
+### Testing
+
+- `pnpm run test` - Run tests for all packages
+- `pnpm run test:coverage` - Run tests with coverage for all packages
+- `pnpm run test:ci` - Run tests in CI mode for all packages
 
 ### Packaging & Publishing
 
@@ -41,39 +47,40 @@ This is a VS Code extension that provides web component information to AI assist
 
 ### Core Components
 
-**Extension Entry Point** (`src/extension.ts`):
+**Extension Entry Point** (`packages/vscode-extension/src/extension.ts`):
 
 - Main activation point that initializes logging, configuration, and container
 - Sets up the dependency injection container and registers commands
 
-**Container** (`src/container.ts`):
+**Container** (`packages/vscode-extension/src/container.ts`):
 
 - Dependency injection container managing all services and providers
 - Central point for service resolution and lifecycle management
 
-**MCP Provider** (`src/mcp/provider.ts`):
+**MCP Provider** (`packages/vscode-extension/src/mcp/`):
 
 - Core MCP server implementation providing web component data
 - Serves HTTP and SSE endpoints for AI assistant integration
-- Implements MCP tools: search-components, get-component-details, list-all-components
+- Implements MCP tools: search-web-components, get-web-component-details, list-all-web-components
+- Now primarily uses the standalone CLI as the MCP server implementation
 
 **Custom Elements Manifest (CEM) System**:
 
-- `src/cem/locator.ts` - Discovers custom-elements.json files in workspace and dependencies
-- `src/cem/reader.ts` - Reads and parses manifest files with caching
+- `packages/vscode-extension/src/cem/locator.ts` - Discovers custom-elements.json files in workspace and dependencies
+- `packages/vscode-extension/src/cem/reader.ts` - Reads and parses manifest files with caching
 
-**Commands** (`src/commands/`):
+**Commands** (`packages/vscode-extension/src/commands/`):
 
 - VS Code command implementations for starting/stopping MCP server
 - Manifest management commands (list, locate, include/exclude)
 - Tree view refresh and information display commands
 
-**Views** (`src/views/`):
+**Views** (`packages/vscode-extension/src/views/`):
 
 - Tree view implementation showing discovered manifests
 - Custom tree nodes for different manifest states and groupings
 
-**System Utilities** (`src/system/`):
+**System Utilities** (`packages/vscode-extension/src/system/`):
 
 - Logging, configuration, decorators, and common utilities
 - Standardized patterns for async operations and error handling
@@ -85,6 +92,27 @@ This is a VS Code extension that provides web component information to AI assist
 3. MCP server starts providing HTTP/SSE endpoints
 4. AI assistants connect to MCP endpoints to query component information
 5. Tree view in VS Code shows discovered manifests with include/exclude controls
+
+### Standalone CLI Package
+
+**CLI Entry Point** (`packages/cli/src/cli.ts`):
+
+- Standalone CLI application with commands for server management, configuration, and manifest discovery
+- Published as `@wcai/cli` npm package with global installation support
+
+**CLI Commands** (`packages/cli/src/commands/`):
+
+- `wcai start` - Start MCP server with HTTP/SSE/STDIO transports
+- `wcai setup` - Interactive setup wizard for MCP client configuration
+- `wcai config` - Configuration management commands
+- `wcai list` - List discovered manifests
+- `wcai locate` - Locate manifest files in workspace
+
+**CLI MCP Server** (`packages/cli/src/core/mcp-server.ts`):
+
+- Core MCP server implementation with same tools as VS Code extension
+- Supports multiple transport protocols (HTTP, SSE, STDIO)
+- Feature parity with VS Code extension MCP provider
 
 ### Configuration
 
@@ -166,7 +194,7 @@ The extension uses VS Code settings under the `wcai.*` namespace:
 
 ### Prerequisites
 
-- Node.js ≥ 22.12.0
+- Node.js ≥ 20.18.3
 - pnpm ≥ 10.x (via corepack)
 - Git ≥ 2.7.2
 
