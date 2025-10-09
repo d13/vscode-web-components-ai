@@ -36,6 +36,78 @@
       "smartStep": true,
       "sourceMapRenames": true,
       "sourceMaps": true
+    },
+    {
+      "name": "Debug CLI",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/packages/cli/dist/index.js",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "outFiles": ["${workspaceFolder}/packages/cli/dist/**/*.js"],
+      "presentation": {
+        "group": "3_cli",
+        "order": 1
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "smartStep": true,
+      "sourceMapRenames": true,
+      "sourceMaps": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug CLI: start",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/packages/cli/dist/index.js",
+      "args": ["start", "--port", "3000"],
+      "cwd": "${workspaceFolder}",
+      "outFiles": ["${workspaceFolder}/packages/cli/dist/**/*.js"],
+      "presentation": {
+        "group": "3_cli",
+        "order": 2
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "smartStep": true,
+      "sourceMapRenames": true,
+      "sourceMaps": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug CLI: list",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/packages/cli/dist/index.js",
+      "args": ["list"],
+      "cwd": "${workspaceFolder}",
+      "outFiles": ["${workspaceFolder}/packages/cli/dist/**/*.js"],
+      "presentation": {
+        "group": "3_cli",
+        "order": 3
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "smartStep": true,
+      "sourceMapRenames": true,
+      "sourceMaps": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug CLI: setup",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/packages/cli/dist/index.js",
+      "args": ["setup"],
+      "cwd": "${workspaceFolder}",
+      "outFiles": ["${workspaceFolder}/packages/cli/dist/**/*.js"],
+      "presentation": {
+        "group": "3_cli",
+        "order": 4
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "smartStep": true,
+      "sourceMapRenames": true,
+      "sourceMaps": true,
+      "console": "integratedTerminal"
     }
   ]
 }
