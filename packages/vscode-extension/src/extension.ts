@@ -37,14 +37,22 @@ export function activate(context: ExtensionContext) {
     }(${version}) on the ${isWeb ? 'web' : 'desktop'}`,
   );
 
+  Logger.log('Extension: Configuring');
   Configuration.configure(context);
+
+  Logger.log('Extension: Creating container');
   const container = Container.create(context, prerelease, extensionVersion);
+  Logger.log('Extension: Container created');
 
   // Register CLI commands and status bar
+  Logger.log('Extension: Registering CLI commands');
   registerCliCommands(context);
   createCliStatusBarItem(context);
 
+  Logger.log('Extension: Registering deferred commands');
   context.subscriptions.push(...registerDeferredCommands(container));
+
+  Logger.log('Extension: Activation complete');
 }
 
 export function deactivate() {
