@@ -11,6 +11,7 @@ export class McpDefinitionProvider implements McpServerDefinitionProvider, Dispo
 
   constructor(private readonly container: Container) {
     this._disposable = Disposable.from(
+      this._onDidChangeMcpServerDefinitions,
       this.container.mcp.onDidChangeHttpServerState(e => this.onDidChangeHttpServerState(e)),
       lm.registerMcpServerDefinitionProvider('wcai.McpDefinitionProvider', this),
     );
@@ -36,6 +37,5 @@ export class McpDefinitionProvider implements McpServerDefinitionProvider, Dispo
 
   dispose(): void {
     this._disposable.dispose();
-    this._onDidChangeMcpServerDefinitions.dispose();
   }
 }
